@@ -1,10 +1,16 @@
 package FrontEnd;
+import Utils.Log;
 import Utils.Models.Response;
 
 import javax.jws.WebService;
 
 @WebService(endpointInterface="Frontend.IFrontEnd")
 public class FrontEndImpl implements  IFrontEnd{
+    Log log;
+    public FrontEndImpl(Log log) {
+        super();
+        this.log=log;
+    }
     @Override
     public Response addMovieSlots(String movieID, String movieName, int bookingCapacity) {
         return null;
