@@ -6,11 +6,13 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.Scanner;
 import java.util.logging.Level;
 
 import FrontEnd.IFrontEnd;
 import Utils.Log;
+import Utils.Models.Response;
 
 public class Client {
     private static URL url;
@@ -342,13 +344,13 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Details entered for booking: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                             try{
-                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets);
-                                if(res == 0){
+                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets).StatusCode;
+                                if(res == 200){
                                     System.out.println("Booking Successful!");
                                     clientLogger.logger.info("Booking was successful");
                                     serverLogger.logger.info("Booking was successful");
                                 }
-                                else if(res == -1){
+                                else {
                                     System.out.println("Could not book ticket!");
                                     clientLogger.logger.info("Could not book ticket!");
                                     serverLogger.logger.info("Could not book ticket!");
@@ -367,24 +369,27 @@ public class Client {
                             clientLogger.logger.info("Admin selected: 2 getBookingScheduleForCustomer for : " + customerId);
                             serverLogger.logger.info("Admin selected: 2 getBookingScheduleForCustomer for : " + customerId);
 
-                            String bookingSchedule = clientObj.getBookingSchedule(customerId, true);
-                            String[] shows = bookingSchedule.split("~");
-                            if(shows.length == 0){
-                                System.out.println("No bookings for given customer.");
-                                clientLogger.logger.info("No bookings for given customer.");
-                                serverLogger.logger.info("No bookings for given customer.");
-                            }
-                            else{
-                                System.out.println("Booking schedule for " + customerId + " are: ");
-                                for(String s: shows){
-                                    System.out.println(s);
+                            Response bookingScheduleRes = clientObj.getBookingSchedule(customerId, true);
+                            if(bookingScheduleRes.StatusCode == 200) {
+                                ArrayList<String> shows = bookingScheduleRes.body;
+                                if(bookingScheduleRes.body.isEmpty()){
+                                    System.out.println("No bookings for given customer.");
+                                    clientLogger.logger.info("No bookings for given customer.");
+                                    serverLogger.logger.info("No bookings for given customer.");
                                 }
-                                clientLogger.logger.info("Bookings returned successfully");
-                                serverLogger.logger.info("Bookings returned successfully");
-                                serverLogger.logger.info("Server Response: ");
+                                else{
+                                    System.out.println("Booking schedule for " + customerId + " are: ");
+                                    for(String s: shows){
+                                        System.out.println(s);
+                                    }
+                                    clientLogger.logger.info("Bookings returned successfully");
+                                    serverLogger.logger.info("Bookings returned successfully");
+                                    serverLogger.logger.info("Server Response: ");
+                                }
+                                System.out.println("Call done!");
+                                clientLogger.logger.info("Call done successfully");
                             }
-                            System.out.println("Call done!");
-                            clientLogger.logger.info("Call done successfully");
+                            
                         }
                         else if(action == 3){
                             System.out.println("You selected: 3 cancelMovieTicketsForCustomer");
@@ -401,12 +406,12 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                             try{
-                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets);
+                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets).StatusCode;
                                 clientLogger.logger.info("webmts.Client call made to server");
-                                if(res == 0){
+                                if(res == 200){
                                     System.out.println("Cancellation successful");
                                 }
-                                else if(res == -1){
+                                else {
                                     System.out.println("Something went wrong.");
                                 }
                                 clientLogger.logger.info("Response from server: " + res);
@@ -432,13 +437,13 @@ public class Client {
                             }
                             System.out.println("Please enter booking capacity");
                             bookingCapacity = getNumTickets();
-                            int res = clientObj.addMovieSlots(movieId,movieName,bookingCapacity);
+                            int res = clientObj.addMovieSlots(movieId,movieName,bookingCapacity).StatusCode;
                             clientLogger.logger.info("Request sent to server");
                             clientLogger.logger.info("Params: " + movieName + " " + movieId + " " + bookingCapacity);
-                            if(res == 0){
+                            if(res == 200){
                                 System.out.println("Slots added successfully");
                             }
-                            else if(res == -1){
+                            else {
                                 System.out.println("Something went wrong!");
                             }
                             clientLogger.logger.info("Response received from server: " + res);
@@ -460,16 +465,16 @@ public class Client {
                             }
                             clientLogger.logger.info("Request sent to server with params: " + movieName + " " + movieId);
 
-                            int res = clientObj.removeMovieSlots(movieId, movieName);
-                            if(res == 0){
+                            int res = clientObj.removeMovieSlots(movieId, movieName).StatusCode;
+                            if(res == 200){
                                 System.out.println("Slots removed successfully");
                             }
-                            else if(res == -1){
+                            else {
                                 System.out.println("Slot could not be removed");
                             }
-                            else{
-                                System.out.println("Something went wrong! Please try again later.");
-                            }
+                            // else{
+                            //     System.out.println("Something went wrong! Please try again later.");
+                            // }
                             clientLogger.logger.info("Response received from server: " + res);
                         }
                         else if (action == 6){
@@ -480,22 +485,24 @@ public class Client {
                             System.out.println("Please enter the movie name");
                             movieName = getMovieName();
                             clientLogger.logger.info("Request sent to server");
-                            String res = clientObj.listMovieShowsAvailability(movieName, true);
-                            String[] shows = res.split("~");
-                            if(shows.length == 0){
-                                System.out.println("There are no shows for this movie");
-                            }
-                            else{
-                                System.out.println("Available shows for " + movieName + " are: ");
-                                for(String s: shows){
-                                    System.out.println(s);
+                            Response res = clientObj.listMovieShowsAvailability(movieName, true);
+                            if(res.StatusCode == 200) {
+                                // String[] shows = res.split("~");
+                                if(res.body.isEmpty()){
+                                    System.out.println("There are no shows for this movie");
                                 }
+                                else {
+                                    System.out.println("Available shows for " + movieName + " are: ");
+                                    for(String s: res.body){
+                                        System.out.println(s);
+                                    }
+                                }
+                                clientLogger.logger.info("Response received from server successfully.");
+                                serverLogger.logger.info("Response received from server successfully.");
+                                serverLogger.logger.info("Server Response: " + res.body);
+
+                            } else {
                             }
-                            clientLogger.logger.info("Response received from server successfully.");
-                            serverLogger.logger.info("Response received from server successfully.");
-                            serverLogger.logger.info("Server Response: " + shows);
-
-
                         }
                         else if(action == 7){
                             System.out.println("You selected: 7 exchangeTicketsForCustomer");
@@ -516,9 +523,9 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + oldMovieName + " " + oldMovieID + " " + newMovieName + " " + newMovieID + " " + numTickets);
                             try{
-                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets);
+                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets).StatusCode;
                                 clientLogger.logger.info("Response from server: " + res);
-                                if(res == 0){
+                                if(res == 200){
                                     System.out.println("Exchange successful");
                                     clientLogger.logger.info("Exchange successful");
                                 }
@@ -567,11 +574,11 @@ public class Client {
                                 int numTickets = getNumTickets();
                                 clientLogger.logger.info("Details entered for booking: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                                 clientLogger.logger.info("Request sent to server");
-                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets);
-                                if(res == 0){
+                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets).StatusCode;
+                                if(res == 200){
                                     System.out.println("Booking Successful!");
                                 }
-                                else if(res == -1){
+                                else {
                                     System.out.println("Could not book ticket!");
                                 }
                                 clientLogger.logger.info("Response from server: " + res);
@@ -590,25 +597,27 @@ public class Client {
 
                                 String customerId = userid;
                                 clientLogger.logger.info("Request sent to server with params: " + customerId);
-                                String res = clientObj.getBookingSchedule(customerId, true);
-
-                                String[] bookingSchedule = res.split("~");
-                                if(res.equals("")){
-                                    System.out.println("No bookings for given customer.");
-                                    clientLogger.logger.info("No bookings for given customer.");
-                                }
-                                else if(bookingSchedule == null || bookingSchedule.equals("")){
-                                    System.out.println("No bookings for given customer.");
-                                    clientLogger.logger.info("No bookings for given customer.");
-                                }
-                                else{
-                                    for(String show: bookingSchedule){
-                                        System.out.println(show.trim());
+                                Response bookingScheduleRes = clientObj.getBookingSchedule(customerId, true);
+                                if(bookingScheduleRes.StatusCode == 200) {
+                                    if(bookingScheduleRes.body.equals("")){
+                                        System.out.println("No bookings for given customer.");
+                                        clientLogger.logger.info("No bookings for given customer.");
                                     }
-                                    clientLogger.logger.info("Bookings for given customer: " + bookingSchedule);
+                                    else if(bookingScheduleRes.body == null || bookingScheduleRes.body.equals("")){
+                                        System.out.println("No bookings for given customer.");
+                                        clientLogger.logger.info("No bookings for given customer.");
+                                    }
+                                    else{
+                                        for(String show: bookingScheduleRes.body){
+                                            System.out.println(show.trim());
+                                        }
+                                        clientLogger.logger.info("Bookings for given customer: " + bookingScheduleRes.body);
+                                    }
+                                    System.out.println("Call done!");
+                                    clientLogger.logger.info("Response received from server successfully.");
                                 }
-                                System.out.println("Call done!");
-                                clientLogger.logger.info("Response received from server successfully.");
+
+                                
                             }
                             catch(Exception ex){
                                 System.out.println("Exception occurred: " + ex);
@@ -629,11 +638,11 @@ public class Client {
                                 System.out.println("Please enter number of tickets");
                                 int numTickets = getNumTickets();
                                 clientLogger.logger.info("Request sent to server with params: " + customerId + " " + movie + " " + movieID + " " + numTickets);
-                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets);
-                                if(res == 0){
+                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets).StatusCode;
+                                if(res == 200){
                                     System.out.println("Cancellation successful");
                                 }
-                                else if(res == -1){
+                                else{
                                     System.out.println("Something went wrong.");
                                 }
                                 clientLogger.logger.info("Response from server: " + res);
@@ -661,9 +670,9 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + oldMovieName + " " + oldMovieID + " " + newMovieName + " " + newMovieID + " " + numTickets);
                             try{
-                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets);
+                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets).StatusCode;
                                 clientLogger.logger.info("Response from server: " + res);
-                                if(res == 0){
+                                if(res == 200){
                                     System.out.println("Exchange successful");
                                 }
                                 else{
