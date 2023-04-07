@@ -10,7 +10,7 @@ public interface IFrontEnd {
     @WebMethod()
     Response addMovieSlots (String movieID, String movieName, int bookingCapacity);
     @WebMethod()
-    Response removeMovieSlots (String movieID, String movieName, boolean isClientCall);
+    Response removeMovieSlots (String movieID, String movieName);
     @WebMethod()
     Response listMovieShowsAvailability (String movieName, boolean isClientCall);
     @WebMethod()

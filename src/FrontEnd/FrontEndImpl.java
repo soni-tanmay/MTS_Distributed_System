@@ -17,7 +17,7 @@ public class FrontEndImpl implements  IFrontEnd{
     }
 
     @Override
-    public Response removeMovieSlots(String movieID, String movieName, boolean isClientCall) {
+    public Response removeMovieSlots(String movieID, String movieName) {
         return null;
     }
 
