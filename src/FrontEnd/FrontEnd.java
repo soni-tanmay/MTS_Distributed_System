@@ -13,7 +13,7 @@ public class FrontEnd {
             log.logger.info("FrontEnd Started");
 
             FrontEndImpl implementation = new FrontEndImpl(log);
-            Endpoint endpoint = Endpoint.publish("http://localhost:8081/"+ "frontend", implementation);
+            Endpoint endpoint = Endpoint.publish("http://localhost:8080/"+ "frontend", implementation);
             System.out.println("frontend is published: " + endpoint.isPublished());
         }catch (Exception e){
             e.printStackTrace();

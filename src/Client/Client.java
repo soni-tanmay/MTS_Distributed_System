@@ -245,20 +245,10 @@ public class Client {
 
 
     }
-    public static void getUrlRef(String server) {
+    public static void getUrlRef() {
         try {
-//            String portNum = "";
-//            if(server.equals("ATWATER")){
-//                portNum = "8080";
-//            }
-//            else if(server.equals("OUTREMONT")){
-//                portNum = "8081";
-//            }
-//            else{
-//                portNum = "8082";
-//            }
-            url = new URL("http://localhost:8080/frontend?wsdl");
-            QName qName = new QName("http://webmts/", "CustomerService");
+            url = new URL("http://localhost:8080/"+"frontend"+"?wsdl");
+            QName qName = new QName("http://FrontEnd/", "FrontEndImplService");
             serviceAPI = Service.create(url, qName);
             clientObj = serviceAPI.getPort(IFrontEnd.class); //Reference of Interface at which Implementation is running
         } catch (MalformedURLException ex) {
@@ -300,7 +290,7 @@ public class Client {
                 String server = identifyClientServer(userid);
                 Log serverLogger = new Log(server + ".txt");
 //                ICustomerApp.webmts.ICustomer client = ICustomerHelper.narrow(ncref.resolve_str(server));
-                getUrlRef(server);
+                getUrlRef();
 //                webmts.ICustomer client = (webmts.ICustomer) Naming.lookup(server);
 //                System.out.println("User Type = " + userType);
 //                clientLogger.logger.info("User type: " + userType);

@@ -4,7 +4,7 @@ import Utils.Models.Response;
 
 import javax.jws.WebService;
 
-@WebService(endpointInterface="Frontend.IFrontEnd")
+@WebService(endpointInterface="FrontEnd.IFrontEnd")
 public class FrontEndImpl implements  IFrontEnd{
     Log log;
     public FrontEndImpl(Log log) {
