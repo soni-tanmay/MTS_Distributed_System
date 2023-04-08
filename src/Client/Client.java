@@ -303,7 +303,7 @@ public class Client {
                         System.out.println("4. addMovieSlots");
                         System.out.println("5. removeMovieSlots");
                         System.out.println("6. listMovieShowsAvailability");
-                        System.out.println("7 exchangeTicketsForCustomer");
+                        System.out.println("7. exchangeTicketsForCustomer");
                         System.out.println("0. change user");
 
                         action = sc.nextInt();

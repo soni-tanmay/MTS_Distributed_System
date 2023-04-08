@@ -7,8 +7,6 @@ import javax.jws.WebService;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
 
 @WebService(endpointInterface="FrontEnd.IFrontEnd")
 public class FrontEndImpl implements  IFrontEnd{
@@ -31,7 +29,7 @@ public class FrontEndImpl implements  IFrontEnd{
     public Response listMovieShowsAvailability(String movieName, boolean isClientCall) {
         System.out.println("Entered listMovieShowsAvailability");
         try {
-            String request = "listMovieShowsAvailability" + movieName + "_" + isClientCall;
+            String request = "listMovieShowsAvailability_" + movieName + "_" + isClientCall;
             requestFEtoSQ(request);
             return null;
         }catch (Exception e){
@@ -63,9 +61,10 @@ public class FrontEndImpl implements  IFrontEnd{
 
     void requestFEtoSQ(String request){
         try {
-            DatagramSocket datagramSocket = new DatagramSocket(Constants.SQPort);
+            DatagramSocket datagramSocket = new DatagramSocket();
             byte[] requestData = request.getBytes();
-            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), Constants.SQPort);
+            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
+            System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
 
 //            byte[] responseData = new byte[1024];
