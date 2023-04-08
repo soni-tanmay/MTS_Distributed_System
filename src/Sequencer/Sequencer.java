@@ -6,6 +6,7 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 // import java.net.InetAddress;
 import java.net.SocketException;
+import java.net.UnknownHostException;
 
 import Utils.Constants;
 
@@ -17,12 +18,13 @@ public class Sequencer {
     private int sequenceNo;
 
     public Sequencer() throws SocketException {
-        this.socket = new DatagramSocket(7000);
+        this.socket = new DatagramSocket(7002);
         // this.multicastAddr = multicastAddr;
         // this.multicastPort = multicastPort;
     }
 
     private void listen() throws IOException {
+        System.out.println("inside listen");
         byte[] bufferData = new byte[1024];
         DatagramPacket dp = new DatagramPacket(bufferData, bufferData.length);
 
@@ -30,12 +32,22 @@ public class Sequencer {
             System.out.println("Sequencer listening to FE at port ");
             socket.receive(dp);
 
-            // String sentenceData = new String(dp.getData(), 0, dp.getLength());
-            // String[] splitSentenceData  = sentenceData.split(";");
+            System.out.println("dp " + dp.getData());
+            String sentenceData = new String(dp.getData(), 0, dp.getLength());
+            System.out.println("sentenceData " + sentenceData);
+            String[] splitSentenceData  = sentenceData.split("_");
+
+            System.out.println("splitSentenceData " + splitSentenceData);
 
             int seqNo = generateSequenceNo();
+            String seqData = addSequenceNoToData(seqNo, sentenceData);
 
-            sendSeqNoToFE(dp, seqNo);
+            System.out.println("seqData" + seqData);
+
+            System.out.println("seqNo " + seqNo);
+            // byte[] message = seqData.getBytes();
+
+            sendSeqNoToFE(dp, seqData);
         }
     }
 
@@ -43,20 +55,20 @@ public class Sequencer {
         return ++this.sequenceNo;
     }
 
-    private void sendSeqNoToFE(DatagramPacket dp, int seqNo) {
-        InetAddress client = null;
-        try {
-            client = InetAddress.getLocalHost();
-        } catch (Exception e) {
-            // TODO: handle exception
-            throw new RuntimeException(e);
-        }
+    private String addSequenceNoToData(int seqNum, String data) {
+        String SeqWithData = seqNum + "_" + data;
+        System.out.println("data " + data);
+        return SeqWithData;
 
-        int clientPort = Constants.FEPort;
+    }
 
-        String resp = String.valueOf(seqNo);
-        byte[] data = resp.getBytes();
-            DatagramPacket resPacket = new DatagramPacket(data, data.length, client, clientPort);
+    private void sendSeqNoToFE(DatagramPacket dp, String seqData) throws UnknownHostException {
+        System.out.println("###" + dp + " " + seqData);
+
+        // String resp = String.valueOf(seqNo);
+        byte[] data = seqData.getBytes();
+            DatagramPacket resPacket = new DatagramPacket(data, data.length, InetAddress.getByName(Constants.FE_IP),  Constants.FEPort);
+            System.out.println("resPacket " + resPacket);
             try {
                 socket.send(resPacket);
             } catch (IOException e) {
