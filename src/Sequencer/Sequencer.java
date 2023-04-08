@@ -46,6 +46,8 @@ public class Sequencer {
 
             System.out.println("seqNo " + seqNo);
             byte[] message = seqData.getBytes();
+
+            broadcastToRm(message);
             
             sendSeqNoToFE(dp, seqData);
         }
@@ -76,7 +78,7 @@ public class Sequencer {
             }
     }
 
-    private void broadcastToRm(byte[] data, int multicastPort) {
+    private void broadcastToRm(byte[] data) {
         DatagramSocket socket1;
                 try {
                     socket1 = new DatagramSocket();
@@ -88,12 +90,8 @@ public class Sequencer {
                 } catch (SocketException e) {
                     throw new RuntimeException(e);
                 }
-
-                // System.out.println("MulticastAddress - "+multicastAddress);
-                System.out.println("MulticastPort - "+multicastPort);
-
                 DatagramPacket dp
-                        = new DatagramPacket(data, data.length, addr, multicastPort);
+                        = new DatagramPacket(data, data.length, multicastAddr, multicastPort);
                 try {
                     socket1.send(dp);
                 } catch (IOException e) {
@@ -104,7 +102,7 @@ public class Sequencer {
     }
 
     public static void main(String[] args) throws IOException {
-        Sequencer seq = new Sequencer(InetAddress.getByName(Constants.RM1_IPAddress), Constants.RM1_Port);
+        Sequencer seq = new Sequencer(InetAddress.getByName(Constants.NetworkIP), Constants.multicastSocket);
         seq.listen();
     }
 }
