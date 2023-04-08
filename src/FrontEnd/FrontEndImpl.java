@@ -1,8 +1,14 @@
 package FrontEnd;
+import Utils.Constants;
 import Utils.Log;
 import Utils.Models.Response;
 
 import javax.jws.WebService;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 
 @WebService(endpointInterface="FrontEnd.IFrontEnd")
 public class FrontEndImpl implements  IFrontEnd{
@@ -23,7 +29,16 @@ public class FrontEndImpl implements  IFrontEnd{
 
     @Override
     public Response listMovieShowsAvailability(String movieName, boolean isClientCall) {
-        return null;
+        System.out.println("Entered listMovieShowsAvailability");
+        try {
+            String request = "listMovieShowsAvailability" + movieName + "_" + isClientCall;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_listMovieShowsAvailability: " + e);
+            return null;
+        }
     }
 
     @Override
@@ -45,4 +60,25 @@ public class FrontEndImpl implements  IFrontEnd{
     public Response exchangeTickets(String customerID, String movieID, String old_movieName, String new_movieID, String new_movieName, int numberOfTickets) {
         return null;
     }
+
+    void requestFEtoSQ(String request){
+        try {
+            DatagramSocket datagramSocket = new DatagramSocket(Constants.SQPort);
+            byte[] requestData = request.getBytes();
+            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), Constants.SQPort);
+            datagramSocket.send(requestDp);
+
+//            byte[] responseData = new byte[1024];
+//            DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
+//            String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
+//            datagramSocket.receive(responseDp);
+//            System.out.println("Received msg from Sequencer: " + response);
+
+//            datagramSocket.close();
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_requestFEtoSQ: " + e);
+        }
+    }
+
 }
