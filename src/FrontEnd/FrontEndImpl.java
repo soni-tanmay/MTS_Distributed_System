@@ -2,6 +2,7 @@ package FrontEnd;
 import Utils.Constants;
 import Utils.Log;
 import Utils.Models.Response;
+import jdk.nashorn.internal.ir.WhileNode;
 
 import javax.jws.WebService;
 import java.net.DatagramPacket;
@@ -61,19 +62,21 @@ public class FrontEndImpl implements  IFrontEnd{
 
     void requestFEtoSQ(String request){
         try {
-            DatagramSocket datagramSocket = new DatagramSocket();
+            DatagramSocket datagramSocket = new DatagramSocket(7001);
             byte[] requestData = request.getBytes();
             DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
             System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
 
-//            byte[] responseData = new byte[1024];
-//            DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
-//            String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
-//            datagramSocket.receive(responseDp);
-//            System.out.println("Received msg from Sequencer: " + response);
+            while(true){
+                byte[] responseData = new byte[4096];
+                DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
+                datagramSocket.receive(responseDp);
+                String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
+                System.out.println("Received msg from Sequencer: " + response);
+//                datagramSocket.close();
+            }
 
-//            datagramSocket.close();
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_requestFEtoSQ: " + e);
