@@ -46,7 +46,7 @@ public class Sequencer {
 
             System.out.println("seqNo " + seqNo);
             // byte[] message = seqData.getBytes();
-
+            
             sendSeqNoToFE(dp, seqData);
         }
     }
