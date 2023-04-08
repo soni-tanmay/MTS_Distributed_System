@@ -7,6 +7,8 @@ import java.net.InetAddress;
 // import java.net.InetAddress;
 import java.net.SocketException;
 
+import Utils.Constants;
+
 public class Sequencer {
     // private InetAddress multicastAddr;
     // private int multicastPort;
@@ -34,9 +36,6 @@ public class Sequencer {
             int seqNo = generateSequenceNo();
 
             sendSeqNoToFE(dp, seqNo);
-
-
-
         }
     }
 
@@ -52,8 +51,17 @@ public class Sequencer {
             // TODO: handle exception
             throw new RuntimeException(e);
         }
-        
 
+        int clientPort = Constants.FEPort;
+
+        String resp = String.valueOf(seqNo);
+        byte[] data = resp.getBytes();
+            DatagramPacket resPacket = new DatagramPacket(data, data.length, client, clientPort);
+            try {
+                socket.send(resPacket);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
     }
 
     public static void main(String[] args) throws IOException {
