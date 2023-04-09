@@ -11,16 +11,16 @@ import java.net.UnknownHostException;
 import Utils.Constants;
 
 public class Sequencer {
-    // private InetAddress multicastAddr;
-    // private int multicastPort;
+    private InetAddress multicastAddr;
+    private int multicastPort;
     private DatagramSocket socket;
 
     private int sequenceNo;
 
-    public Sequencer() throws SocketException {
+    public Sequencer(InetAddress multicastAddr, int multicastPort) throws SocketException {
         this.socket = new DatagramSocket(7002);
-        // this.multicastAddr = multicastAddr;
-        // this.multicastPort = multicastPort;
+        this.multicastAddr = multicastAddr;
+        this.multicastPort = multicastPort;
     }
 
     private void listen() throws IOException {
@@ -45,7 +45,9 @@ public class Sequencer {
             System.out.println("seqData" + seqData);
 
             System.out.println("seqNo " + seqNo);
-            // byte[] message = seqData.getBytes();
+            byte[] message = seqData.getBytes();
+
+            broadcastToRm(message);
             
             sendSeqNoToFE(dp, seqData);
         }
@@ -76,8 +78,31 @@ public class Sequencer {
             }
     }
 
+    private void broadcastToRm(byte[] data) {
+        DatagramSocket socket1;
+                try {
+                    socket1 = new DatagramSocket();
+                } catch (SocketException e) {
+                    throw new RuntimeException(e);
+                }
+                try {
+                    socket1.setBroadcast(true);
+                } catch (SocketException e) {
+                    throw new RuntimeException(e);
+                }
+                DatagramPacket dp
+                        = new DatagramPacket(data, data.length, multicastAddr, multicastPort);
+                try {
+                    socket1.send(dp);
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+                socket1.close();
+
+    }
+
     public static void main(String[] args) throws IOException {
-        Sequencer seq = new Sequencer();
+        Sequencer seq = new Sequencer(InetAddress.getByName(Constants.NetworkIP), Constants.multicastSocket);
         seq.listen();
     }
 }

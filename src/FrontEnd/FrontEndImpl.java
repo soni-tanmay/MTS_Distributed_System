@@ -2,8 +2,6 @@ package FrontEnd;
 import Utils.Constants;
 import Utils.Log;
 import Utils.Models.Response;
-import jdk.nashorn.internal.ir.WhileNode;
-
 import javax.jws.WebService;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
@@ -18,12 +16,30 @@ public class FrontEndImpl implements  IFrontEnd{
     }
     @Override
     public Response addMovieSlots(String movieID, String movieName, int bookingCapacity) {
-        return null;
+        System.out.println("Entered addMovieSlots");
+        try {
+            String request = "addMovieSlots_" + movieID + "_" + movieName+"_"+bookingCapacity;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_addMovieSlots: " + e);
+            return null;
+        }
     }
 
     @Override
     public Response removeMovieSlots(String movieID, String movieName) {
-        return null;
+        System.out.println("Entered removeMovieSlots");
+        try {
+            String request = "removeMovieSlots_" + movieID + "_" + movieName;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_removeMovieSlots: " + e);
+            return null;
+        }
     }
 
     @Override
@@ -42,22 +58,58 @@ public class FrontEndImpl implements  IFrontEnd{
 
     @Override
     public Response bookMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
-        return null;
+        System.out.println("Entered bookMovieTickets");
+        try {
+            String request = "bookMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_bookMovieTickets: " + e);
+            return null;
+        }
     }
 
     @Override
     public Response getBookingSchedule(String customerID, boolean isClientCall) {
-        return null;
+        System.out.println("Entered getBookingSchedule");
+        try {
+            String request = "getBookingSchedule_" + customerID + "_" + isClientCall;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_getBookingSchedule: " + e);
+            return null;
+        }
     }
 
     @Override
     public Response cancelMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
-        return null;
+        System.out.println("Entered cancelMovieTickets");
+        try {
+            String request = "cancelMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_cancelMovieTickets: " + e);
+            return null;
+        }
     }
 
     @Override
     public Response exchangeTickets(String customerID, String movieID, String old_movieName, String new_movieID, String new_movieName, int numberOfTickets) {
-        return null;
+        System.out.println("Entered exchangeTickets");
+        try {
+            String request = "exchangeTickets_" + customerID + "_" + movieID+"_"+old_movieName+"_"+new_movieID+"_"+new_movieName+"_"+numberOfTickets;
+            requestFEtoSQ(request);
+            return null;
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_exchangeTickets: " + e);
+            return null;
+        }
     }
 
     void requestFEtoSQ(String request){
