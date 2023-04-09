@@ -66,12 +66,12 @@ public class ReplicaManager1 {
     public static void sendResponseToFE(String response){
         DatagramSocket ds = null;
         try{
-            ds = new DatagramSocket();
+            ds = new DatagramSocket(Constants.RM1Port);
             byte[] req = response.getBytes();
             InetAddress ia = InetAddress.getByName(Constants.FE_IP);
-            DatagramPacket dp = new DatagramPacket(req,req.length,ia,Constants.FEPort);
+            DatagramPacket dp = new DatagramPacket(req,req.length,ia,Constants.FEResPort);
             ds.send(dp);
-            rmLogger.logger.info("Datagram packet sent to port " + Constants.FEPort);
+            rmLogger.logger.info("Datagram packet sent to port " + Constants.FEResPort);
 
 //            byte[] resp = new byte[1024];
 //            DatagramPacket dpreply = new DatagramPacket(resp,resp.length);
