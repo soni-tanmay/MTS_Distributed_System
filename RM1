@@ -1,0 +1,8 @@
+Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
+INFO: Received datagram packet
+Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
+INFO: Datagram packet response sent.
+Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
+INFO: Multicast Socket closed.
+Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
+WARNING: Exception occurred: java.net.SocketException: Socket closed
