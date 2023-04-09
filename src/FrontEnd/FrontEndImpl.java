@@ -6,6 +6,10 @@ import javax.jws.WebService;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.util.Timer;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.CountDownLatch;
+
 
 @WebService(endpointInterface="FrontEnd.IFrontEnd")
 public class FrontEndImpl implements  IFrontEnd{
@@ -14,17 +18,19 @@ public class FrontEndImpl implements  IFrontEnd{
         super();
         this.log=log;
     }
+
+    private static long timeout = 10000;
     @Override
     public Response addMovieSlots(String movieID, String movieName, int bookingCapacity) {
         System.out.println("Entered addMovieSlots");
         try {
             String request = "addMovieSlots_" + movieID + "_" + movieName+"_"+bookingCapacity;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_addMovieSlots: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -34,11 +40,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "removeMovieSlots_" + movieID + "_" + movieName;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_removeMovieSlots: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -48,11 +54,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "listMovieShowsAvailability_" + movieName + "_" + isClientCall;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_listMovieShowsAvailability: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -62,11 +68,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "bookMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_bookMovieTickets: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -76,11 +82,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "getBookingSchedule_" + customerID + "_" + isClientCall;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_getBookingSchedule: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -90,11 +96,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "cancelMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_cancelMovieTickets: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -104,11 +110,11 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "exchangeTickets_" + customerID + "_" + movieID+"_"+old_movieName+"_"+new_movieID+"_"+new_movieName+"_"+numberOfTickets;
             requestFEtoSQ(request);
-            return null;
+            return new Response(200,null);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_exchangeTickets: " + e);
-            return null;
+            return new Response(400,null);
         }
     }
 
@@ -119,6 +125,7 @@ public class FrontEndImpl implements  IFrontEnd{
             DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
             System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
+            startTimer();
 
             byte[] responseData = new byte[4096];
             DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
@@ -126,10 +133,19 @@ public class FrontEndImpl implements  IFrontEnd{
             String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
             System.out.println("Received msg from Sequencer: " + response);
             datagramSocket.close();
-
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_requestFEtoSQ: " + e);
+        }
+    }
+
+    void startTimer(){
+        try {
+            new Timer().wait(timeout);
+            System.out.println("end timer");
+        }catch (Exception e){
+            e.printStackTrace();
+            System.out.println("FrontEndImpl_startTimer: " + e);
         }
     }
 

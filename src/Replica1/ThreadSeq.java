@@ -12,7 +12,7 @@ public class ThreadSeq implements Runnable{
     private String sequencerIP = "";
     private Log logger;
     private int portNum;
-//
+    //
 ////    public ThreadSeq(int portNum, Log logger, CustomerImpl serverInstance){
 ////        this.portNum = portNum;
 ////        this.logger = logger;
@@ -23,7 +23,7 @@ public class ThreadSeq implements Runnable{
         this.logger = logger;
     }
 
-//
+    //
     @Override
     public void run() {
         MulticastSocket ms = null;
