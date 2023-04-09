@@ -9,17 +9,17 @@ import javax.jws.soap.SOAPBinding;
 @SOAPBinding(style= SOAPBinding.Style.RPC)
 public interface ICustomer {
     @WebMethod()
-    Response addMovieSlots (String movieID, String movieName, int bookingCapacity);
+    String addMovieSlots (String movieID, String movieName, int bookingCapacity);
     @WebMethod()
-    Response removeMovieSlots (String movieID, String movieName);
+    String removeMovieSlots (String movieID, String movieName);
     @WebMethod()
-    Response listMovieShowsAvailability (String movieName, boolean isClientCall);
+    String listMovieShowsAvailability (String movieName, boolean isClientCall);
     @WebMethod()
-    Response bookMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets);
+    String bookMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets);
     @WebMethod()
-    Response getBookingSchedule (String customerID, boolean isClientCall);
+    String getBookingSchedule (String customerID, boolean isClientCall);
     @WebMethod()
-    Response cancelMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets);
+    String cancelMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets);
     @WebMethod()
-    Response exchangeTickets (String customerID, String movieID, String old_movieName, String new_movieID, String new_movieName, int numberOfTickets);
+    String exchangeTickets (String customerID, String movieID, String old_movieName, String new_movieID, String new_movieName, int numberOfTickets);
 }

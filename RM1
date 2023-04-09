@@ -6,3 +6,7 @@ Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
 INFO: Multicast Socket closed.
 Apr 08, 2023 3:50:19 AM Replica1.ThreadSeq run
 WARNING: Exception occurred: java.net.SocketException: Socket closed
+Apr 09, 2023 2:30:00 AM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 09, 2023 2:30:00 AM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007

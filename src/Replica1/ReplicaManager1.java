@@ -15,7 +15,8 @@ public class ReplicaManager1 {
         rmLogger = new Log("RM1");
     }
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws IOException {
+        rmLogger = new Log("RM1");
         new Thread(
             () -> {
                 try{
@@ -51,8 +52,10 @@ public class ReplicaManager1 {
         }
         catch(Exception ex) {
             System.out.println("Exception occurred!!!");
-            rmLogger.logger.warning("Exception occurred: " + ex);
             System.out.println(ex);
+            ex.printStackTrace();
+            rmLogger.logger.warning("Exception occurred: " + ex);
+
         }
         finally {
             System.out.println("Exit Server");

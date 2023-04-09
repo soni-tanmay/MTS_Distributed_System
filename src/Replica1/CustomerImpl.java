@@ -11,6 +11,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import Utils.*;
+import Utils.Models.Response;
 
 class sortAvailableShowListComparator implements Comparator {
     @Override
@@ -88,15 +89,14 @@ public class CustomerImpl implements ICustomer {
                 return response;
 
             case "bookMovieTickets":
-                int res = bookMovieTickets(args[1],args[2],args[3],Integer.parseInt(args[4]));
-                if(res == 0){
+                String res = bookMovieTickets(args[1],args[2],args[3],Integer.parseInt(args[4]));
+                if(res.equals("Success")){
                     System.out.println("Ticket Booking Successful!");
                 }
-                else if(res == -1){
+                else if(res.equals("Failure")){
                     System.out.println("Something went wrong!");
                 }
-//                return res + "";
-                response = (res + "").getBytes();
+                response = res.getBytes();
                 return response;
 
             case "getBookingSchedule":
@@ -107,15 +107,15 @@ public class CustomerImpl implements ICustomer {
 
 
             case "cancelMovieTickets":
-                int result = cancelMovieTickets(args[1],args[2],args[3],Integer.parseInt(args[4]));
-                if(result == 0){
+                String result = cancelMovieTickets(args[1],args[2],args[3],Integer.parseInt(args[4]));
+                if(result.equals("Success")){
                     System.out.println("Ticket Cancellation Successful!");
                 }
-                else if(result == -1){
+                else if(result.equals("Failure")){
                     System.out.println("Something went wrong!");
                 }
 //                return result + "";
-                response = (result + "").getBytes();
+                response = result.getBytes();
                 return response;
         }
         return response;
@@ -258,32 +258,58 @@ public class CustomerImpl implements ICustomer {
         }
     }
 
-    public int isCancelled(String customerID, String movieID, String movieName, int numOfTickets){
+    public String isCancelled(String customerID, String movieID, String movieName, int numOfTickets){
         try{
-            int res = cancelMovieTickets(customerID, movieID, movieName, numOfTickets);
+            String res = cancelMovieTickets(customerID, movieID, movieName, numOfTickets);
             return res;
         }
         catch(Exception ex){
             ex.printStackTrace();
-            return -1;
+            return "Failure";
         }
     }
 
-    public int isBooked(String customerID, String movieID, String movieName, int numOfTickets){
+    public String isBooked(String customerID, String movieID, String movieName, int numOfTickets){
         try{
-            int res = bookMovieTickets(customerID,movieID,movieName,numOfTickets);
+            String res = bookMovieTickets(customerID,movieID,movieName,numOfTickets);
             return res;
         }
         catch(Exception ex){
             ex.printStackTrace();
-            return -1;
+            return "Failure";
         }
     }
 
+    public Response convertIntToResponse(int result){
+        if(result == 0){
+            return new Response(200, null);
+        }
+        else{
+            return new Response(400, null);
+        }
+    }
 
+    public Response convertStringToResponse(String result){
+        return new Response(200,null);
+    }
+    public String convertIntToString(int result){
+        if (result == 0){
+            return "Success";
+        }
+        else {
+            return "Failure";
+        }
+    }
+    public int convertStringToInt(String result){
+        if(result.equals("Success")){
+            return 0;
+        }
+        return -1;
+    }
 
     @Override
-    public Response addMovieSlots(String movieId, String movieName, int bookingCapacity) {
+    public String addMovieSlots(String movieId, String movieName, int bookingCapacity) {
+
         try{
             logger.logger.info("Called addMovieSlots with details: " + movieId + " " + movieName + " " + bookingCapacity);
             System.out.println("Entered addMovieSlots()");
@@ -318,22 +344,23 @@ public class CustomerImpl implements ICustomer {
                 }
             }
             logger.logger.info("Function call completed successfully");
-            return 0;
+            return "Success";
         }
         catch(Exception ex){
             System.out.println("Exception thrown" + ex.getMessage());
             logger.logger.warning("Exception occurred: " + ex);
-            return -1;
+            return "Failure";
         }
     }
 
     @Override
-    public Response removeMovieSlots(String movieID, String movieName) {
+    public String removeMovieSlots(String movieID, String movieName) {
 
         logger.logger.info("Called function removeMovieSlots with details: " + movieID + " " + movieName);
         if(movies == null || movies.get(movieName) == null || movies.get(movieName).get(movieID) == null) {
             logger.logger.info("Could not remove slots. Bad request.");
-            return -1;
+            return "Failure";
+//            return -1;
         }
         ArrayList<String> customers = movies.get(movieName).get(movieID).customers;
         ConcurrentHashMap<String, Integer> bookings = new ConcurrentHashMap<>();
@@ -367,7 +394,7 @@ public class CustomerImpl implements ICustomer {
 
         //get available movie slots in current server
         String shows = listMovieShowsAvailability(movieName, false);
-        String[] availableShows = shows.split("~");
+        String[] availableShows = shows.split("_");
         ArrayList<String> avlShows = new ArrayList<>(); //Arrays.asList(availableShows)
         for(String show: availableShows){
             avlShows.add(show.trim());
@@ -375,7 +402,8 @@ public class CustomerImpl implements ICustomer {
 
         if(avlShows.size() == 0){ //availableShows
             System.out.println("No further show to book movie ticket");
-            return 0;
+            return "Success";
+//            return 0;
         }
 
         //available slots retrieved
@@ -397,8 +425,8 @@ public class CustomerImpl implements ICustomer {
             if(bookings != null && bookings.get(customerID) != null){
                 int numTickets = bookings.get(customerID);
                 for(String show : accessibleShows){
-                    int result = bookMovieTickets(customerID, show.split(" ")[0], movieName, numTickets);
-                    if(result == 0){
+                    String result = bookMovieTickets(customerID, show.split(" ")[0], movieName, numTickets);
+                    if(result.equals("Success")){
 //                    customers.remove(customerID); //to be checked if can be removed
                         break;
                     }
@@ -407,11 +435,12 @@ public class CustomerImpl implements ICustomer {
 
         }
         logger.logger.info("Function executed successfully. Returning 0");
-        return 0;
+        return "Success";
+//        return 0;
     }
 
     @Override
-    public Response listMovieShowsAvailability(String movieName, boolean isClientCall) {
+    public String listMovieShowsAvailability(String movieName, boolean isClientCall) {
 
         logger.logger.info("Called function listMovieShowsAvailability with params: " + " " + movieName);
         System.out.println("Entered listMovieShowsAvailability for server: " + serverName);
@@ -475,7 +504,7 @@ public class CustomerImpl implements ICustomer {
                 String res1 = new String(dpreply1.getData()).trim();
                 if(!res1.isEmpty()){
                     System.out.println("Res1: " + res1);
-                    for(String show: res1.split("~")){
+                    for(String show: res1.split("_")){
                         if(!show.trim().isEmpty()){
                             availableShows.add(show.trim());
                         }
@@ -485,37 +514,10 @@ public class CustomerImpl implements ICustomer {
                 String res2 = new String(dpreply2.getData()).trim();
                 if(!res2.isEmpty()){
                     System.out.println("Res2: " + res2);
-                    for(String show: res2.split("~")){
+                    for(String show: res2.split("_")){
                         availableShows.add(show.trim());
                     }
                 }
-//                byte[] res1 = dpreply1.getData();
-//                ByteArrayInputStream bais = new ByteArrayInputStream(res1);
-//                DataInputStream in = new DataInputStream(bais);
-//                logger.logger.info("Response received for 1st datagram packet");
-//                while (in.available() > 0) {
-//                    String element = in.readUTF();
-//                    if(element == null || element.equals("")){
-//                        System.out.println("Exit while loop for in.available");
-//                        break;
-//                    }
-//                    availableShows.add(element);
-//                    System.out.println("in while1 in.available" + element);
-//                }
-//
-//                byte[] res2 = dpreply2.getData();
-//                ByteArrayInputStream bais2 = new ByteArrayInputStream(res2);
-//                DataInputStream in2 = new DataInputStream(bais2);
-//                logger.logger.info("Response received for 1st datagram packet");
-//                while (in2.available() > 0) {
-//                    String element = in2.readUTF();
-//                    if(element == null || element.equals("")){
-//                        System.out.println("Exit while loop for in2.available");
-//                        break;
-//                    }
-//                    availableShows.add(element);
-//                    System.out.println("in while2 in2.available" + element);
-//                }
                 ds1.close();
                 ds2.close();
                 logger.logger.info("Datagram sockets closed");
@@ -533,20 +535,17 @@ public class CustomerImpl implements ICustomer {
         if(!availableShows.isEmpty()){
             for (String show: availableShows){
                 System.out.println("Result: " + result);
-                result = result.concat(show.trim() + "~");
-
+                result = result.concat(show.trim() + "_");
             }
         }
         result = result.substring(0,result.length()-1);
         System.out.println("listMovieShowsAvailability returning: " + result);
         logger.logger.info("Function call completed. Returning: " + result);
         return result;
-
-//        return "success";
     }
 
     @Override
-    public Response bookMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
+    public String bookMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
         logger.logger.info("Called function bookMovieTickets");
         logger.logger.info("Params: " + " " + customerID + " " + movieID + " " + movieName + " " + numberOfTickets);
         System.out.println("Entered bookMovieTickets() for server: " + serverName);
@@ -563,11 +562,11 @@ public class CustomerImpl implements ICustomer {
                 if(numberOfTickets>3){
                     System.out.println("numberOfTickets>3");
                     logger.logger.info("Unsuccessful booking");
-                    return -1;
+                    return "Failure";
                 }
                 String bookings = getBookingSchedule(customerID, true);
                 //condition for 3 tickets outside own server
-                String[] bookedShows = bookings.split("~");
+                String[] bookedShows = bookings.split("_");
                 int otherServerTickets = 0;
                 if(!bookings.equals("")){
                     for(String show: bookedShows){
@@ -583,7 +582,8 @@ public class CustomerImpl implements ICustomer {
                     if(otherServerTickets + numberOfTickets > 3){
                         System.out.println("otherServerTickets + numberOfTickets > 3 - Unsuccessful call");
                         logger.logger.info("Unsuccessful booking");
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
 //                for(String show: bookedShows){
@@ -606,26 +606,26 @@ public class CustomerImpl implements ICustomer {
                 System.out.println("Entered positive scenario");
                 if(movieLocation.equals("ATW")){
                     if(customerLocation.equals("VER")){
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, verAtwPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, verAtwPortNum));
                     }
                     else{ //customerLocation.equals("OUT")
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, outAtwPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, outAtwPortNum));
                     }
                 }
                 else if(movieLocation.equals("VER")){
                     if(customerLocation.equals("ATW")){
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, atwVerPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, atwVerPortNum));
                     }
                     else{ //customerLocation.equals("OUT")
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, outVerPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, outVerPortNum));
                     }
                 }
                 else { //movieLocation = OUT
                     if(customerLocation.equals("VER")){
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, verOutPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, verOutPortNum));
                     }
                     else{ //customerLocation.equals("ATW")
-                        return makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, atwOutPortNum);
+                        return convertIntToString(makeUDPCallForBookingTicket(customerID, movieID, movieName, numberOfTickets, atwOutPortNum));
                     }
                 }
             }
@@ -634,12 +634,14 @@ public class CustomerImpl implements ICustomer {
                 if(movies==null || movies.get(movieName) == null || movies.get(movieName).get(movieID) == null){
                     System.out.println("No slot available!");
                     logger.logger.info("Unsuccessful booking");
-                    return -1;
+                    return "Failure";
+//                    return -1;
                 }
                 else if(movies.get(movieName).get(movieID).capacity < numberOfTickets){
                     System.out.println("Required tickets unavailable!");
                     logger.logger.info("Unsuccessful booking");
-                    return -1;
+                    return "Failure";
+//                    return -1;
                 }
                 else if(movies.get(movieName).get(movieID).capacity >= numberOfTickets) {
                     System.out.println("Capacity: " + movies.get(movieName).get(movieID).capacity);
@@ -655,23 +657,26 @@ public class CustomerImpl implements ICustomer {
                     int res = populateCustomerBookings(customerID, movieID, movieName, numberOfTickets);
                     System.out.println("Returning: " + res);
                     logger.logger.info("Successful booking");
-                    return res;
+                    return convertIntToString(res);
+//                    return res;
                 }
                 logger.logger.info("Function call completed");
-                return 0;
+                return "Success";
+//                return 0;
             }
         }
         catch(Exception ex){
             System.out.println("Exception thrown" + ex.getMessage());
             logger.logger.warning("Exception thrown" + ex);
-            return -1;
+            return "Failure";
+//                    return -1;
         }
 
 //        return 0;
     }
 
     @Override
-    public Response getBookingSchedule(String customerID, boolean isClientCall) {
+    public String getBookingSchedule(String customerID, boolean isClientCall) {
 
         logger.logger.info("Called function getBookingSchedule with params: " + customerID);
         ArrayList<String> bookingSchedule = new ArrayList<>();
@@ -737,7 +742,7 @@ public class CustomerImpl implements ICustomer {
                 String res1 = new String(dpreply1.getData()).trim();
                 if(!res1.isEmpty()){
                     System.out.println("Res1: " + res1);
-                    for(String show: res1.split("~")){
+                    for(String show: res1.split("_")){
                         if(!show.trim().isEmpty()){
                             bookingSchedule.add(show.trim());
                         }
@@ -747,35 +752,10 @@ public class CustomerImpl implements ICustomer {
                 String res2 = new String(dpreply2.getData()).trim();
                 if(!res2.isEmpty()){
                     System.out.println("Res2: " + res2);
-                    for(String show: res2.split("~")){
+                    for(String show: res2.split("_")){
                         bookingSchedule.add(show.trim());
                     }
                 }
-//                byte[] res1 = dpreply1.getData();
-//                ByteArrayInputStream bais = new ByteArrayInputStream(res1);
-//                DataInputStream in = new DataInputStream(bais);
-//                while (in.available() > 0) {
-//                    String element = in.readUTF();
-//                    if(element == null || element.equals("")){
-//                        System.out.println("Exit while loop for in.available");
-//                        break;
-//                    }
-//                    bookingSchedule.add(element);
-//                    System.out.println("in while1 in.available" + element);
-//                }
-//
-//                byte[] res2 = dpreply2.getData();
-//                ByteArrayInputStream bais2 = new ByteArrayInputStream(res2);
-//                DataInputStream in2 = new DataInputStream(bais2);
-//                while (in2.available() > 0) {
-//                    String element = in2.readUTF();
-//                    if(element == null || element.equals("")){
-//                        System.out.println("Exit while loop for in2.available");
-//                        break;
-//                    }
-//                    bookingSchedule.add(element);
-//                    System.out.println("in while2 in2.available" + element);
-//                }
                 ds1.close();
                 ds2.close();
             }
@@ -791,7 +771,7 @@ public class CustomerImpl implements ICustomer {
         if(!bookingSchedule.isEmpty()){
             for (String show: bookingSchedule){
                 System.out.println("Result: " + result);
-                result = result.concat(show.trim() + "~");
+                result = result.concat(show.trim() + "_");
             }
             result = result.substring(0,result.length()-1);
         }
@@ -799,13 +779,15 @@ public class CustomerImpl implements ICustomer {
         System.out.println("listMovieShowsAvailability returning: " + result);
         logger.logger.info("Function call completed. Returning " + result);
         return result;
+//                    return -1;
+
 
 
 //        return "success";
     }
 
     @Override
-    public Response cancelMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
+    public String cancelMovieTickets(String customerID, String movieID, String movieName, int numberOfTickets) {
         logger.logger.info("Entered function cancelMovieTickets");
         logger.logger.info("Request params: " + customerID + " " + movieID + " " + movieName + " " + numberOfTickets);
         System.out.println("Entered cancelMovieTickets for server: " + serverName);
@@ -820,31 +802,31 @@ public class CustomerImpl implements ICustomer {
                 if(movieLocation.equals("ATW")){
                     if(customerLocation.equals("VER")){
                         logger.logger.info("Making udp call to ATW server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, verAtwPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, verAtwPortNum));
                     }
                     else{ //customerLocation.equals("OUT")
                         logger.logger.info("Making udp call to ATW server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, outAtwPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, outAtwPortNum));
                     }
                 }
                 else if(movieLocation.equals("VER")){
                     if(customerLocation.equals("ATW")){
                         logger.logger.info("Making udp call to VER server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, atwVerPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, atwVerPortNum));
                     }
                     else{ //customerLocation.equals("OUT")
                         logger.logger.info("Making udp call to VER server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, outVerPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, outVerPortNum));
                     }
                 }
                 else { //movieLocation = OUT
                     if(customerLocation.equals("VER")){
                         logger.logger.info("Making udp call to OUT server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, verOutPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, verOutPortNum));
                     }
                     else{ //customerLocation.equals("ATW")
                         logger.logger.info("Making udp call to OUT server");
-                        return makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, atwOutPortNum);
+                        return convertIntToString(makeUDPCallForCancellingTicket(customerID, movieID, movieName, numberOfTickets, atwOutPortNum));
                     }
                 }
             }
@@ -852,12 +834,14 @@ public class CustomerImpl implements ICustomer {
                 if(movies==null || movies.get(movieName) == null || movies.get(movieName).get(movieID) == null){
                     logger.logger.info("Unsuccessful cancellation!");
                     System.out.println("No such show exists!");
-                    return -1;
+                    return "Failure";
+//                        return -1;
                 }
                 else if(customerBookings == null || customerBookings.get(customerID).isEmpty()){
                     logger.logger.info("Unsuccessful cancellation!");
                     System.out.println("else if unsuccessful cancel Line761");
-                    return -1;
+                    return "Failure";
+//                        return -1;
                 }
                 else {
                     System.out.println("Entered else");
@@ -879,7 +863,8 @@ public class CustomerImpl implements ICustomer {
                         if(numberOfTickets > totalBookedTickets){
                             logger.logger.info("Unsuccessful cancellation!");
                             System.out.println("Entered if numberOfTickets > totalBookedTickets");
-                            return -1;
+                            return "Failure";
+//                        return -1;
                         }
                         //case2: tickets to be cancelled < tickets booked
                         else if(numberOfTickets < totalBookedTickets){
@@ -891,7 +876,8 @@ public class CustomerImpl implements ICustomer {
                                 if(show.movieID.equals(movieID) && show.movieName.equals(movieName)){
                                     customerBookings.get(customerID).get(i).tickets -= numberOfTickets;
                                     logger.logger.info("Successful cancellation of some tickets!");
-                                    return 0;
+                                    return "Success";
+//                        return 0;
                                 }
                             }
                         }
@@ -910,20 +896,23 @@ public class CustomerImpl implements ICustomer {
                                             customerBookings.remove(customerID);
                                         }
                                         logger.logger.info("Successful cancellation of all tickets!");
-                                        return 0;
+                                        return "Success";
+//                                        return 0;
                                     }
                                 }
                             }
                             else{
                                 System.out.println("Could not remove tickets!");
                                 logger.logger.info("Unsuccessful cancellation!");
-                                return -1;
+                                return "Failure";
+//                          return -1;
                             }
                         }
                     }
                     else{
                         logger.logger.info("Unsuccessful cancellation!");
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
 
@@ -932,14 +921,16 @@ public class CustomerImpl implements ICustomer {
         catch(Exception ex){
             System.out.println("Exception thrown" + ex.getMessage());
             logger.logger.info("Unsuccessful cancellation! Exception occurred: " + ex);
-            return -1;
+            return "Failure";
+//                        return -1;
         }
         logger.logger.info("Unsuccessful cancellation!");
-        return -1;
+        return "Failure";
+//                        return -1;
     }
 
     @Override
-    public Response exchangeTickets(String customerID, String old_movieName, String movieID, String new_movieID, String new_movieName, int numberOfTickets) {
+    public String exchangeTickets(String customerID, String old_movieName, String movieID, String new_movieID, String new_movieName, int numberOfTickets) {
         try{
             logger.logger.info("Entered exchangeTickets() with params: " + "customerID: " + customerID + ", old_movieName: " + old_movieName + ", movieID:  " + movieID + ", new_movieID:  " + new_movieID + ", new_movieName: " + new_movieName + ", numberOfTickets: " + numberOfTickets);
             String oldLocation = movieID.toUpperCase().substring(0,3);
@@ -950,49 +941,57 @@ public class CustomerImpl implements ICustomer {
             //check if home theater for new show
             if(newLocation.equals(userLocation)){
                 //book, cancel, cancel
-                isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets);
+                isBooked = convertStringToInt(bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets));
                 if(isBooked == 0){
-                    isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                    isCancelled = convertStringToInt(cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                     if(isCancelled == 0){
                         logger.logger.info("Tickets exchanged successfully. Transaction complete");
-                        return 0;
+                        return "Success";
+//                        return 0;
                     }
                     else{
                         logger.logger.info("Could not cancel previous ticket.");
-                        int res = cancelMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets);
+                        int res = convertStringToInt(cancelMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets));
                         if(res == 0){
-                            return -1;
+                            return "Failure";
+//                        return -1;
                         }
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
                 logger.logger.info("Could not book ticket. Transaction failed");
-                return -1;
+                return "Failure";
+//                        return -1;
             }
 
             //check if both shows in same location
             if(newLocation.equals(oldLocation)){
                 //cancel, book, book
-                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                isCancelled = convertStringToInt(cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                 if(isCancelled == 0){
                     System.out.println("Movie successfully cancelled. Proceeding to book ticket");
-                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets);
+                    isBooked = convertStringToInt(bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets));
                     if(isBooked == 0){
                         System.out.println("Movie successfully booked. Transaction successful");
                         logger.logger.info("Movie successfully booked. Transaction successful");
-                        return 0;
+                        return "Success";
+//                        return 0;
                     }
                     else{
-                        int res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                        int res = convertStringToInt(bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                         if(res == 0){
                             logger.logger.info("Could not book ticket. Transaction reversed.");
-                            return -1;
+                            return "Failure";
+//                        return -1;
                         }
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
                 logger.logger.info("Could not cancel ticket. Exchange could not be performed.");
-                return -1;
+                return "Failure";
+//                        return -1;
             }
 
             //check if both in other servers
@@ -1000,46 +999,54 @@ public class CustomerImpl implements ICustomer {
                 //cancel, book, book
                 // or
                 //get booking schedule, check bookings and num of tickets
-                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                isCancelled = convertStringToInt(cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                 if(isCancelled == 0){
-                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets);
+                    isBooked = convertStringToInt(bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets));
                     if(isBooked == 0){
                         logger.logger.info("Exchange of tickets successful. Transaction complete.");
-                        return 0;
+                        return "Success";
+//                        return 0;
                     }
                     else {
-                        int res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                        int res = convertStringToInt(bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                         if(res == 0){
                             System.out.println("Could not book ticket. Transaction reversed.");
                             logger.logger.info("Could not book ticket. Transaction reversed.");
-                            return -1;
+                            return "Failure";
+//                        return -1;
                         }
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
                 logger.logger.info("Could not cancel previous ticket. Transaction failed.");
-                return -1;
+                return "Failure";
+//                        return -1;
             }
             else {
-                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                isCancelled = convertStringToInt(cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                 if(isCancelled == 0){
-                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets);
+                    isBooked = convertStringToInt(bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets));
                     if(isBooked == 0){
                         logger.logger.info("Exchange of tickets successful. Transaction complete.");
-                        return 0;
+                        return "Success";
+//                        return 0;
                     }
                     else {
-                        int res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets);
+                        int res = convertStringToInt(bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets));
                         if(res == 0){
                             System.out.println("Could not book ticket. Transaction reversed.");
                             logger.logger.info("Could not book ticket. Transaction reversed.");
-                            return -1;
+                            return "Failure";
+//                        return -1;
                         }
-                        return -1;
+                        return "Failure";
+//                        return -1;
                     }
                 }
                 logger.logger.info("Could not cancel previous ticket. Transaction failed.");
-                return -1;
+                return "Failure";
+//                        return -1;
             }
 
 //            System.out.println("Unhandled scenario reached.");
@@ -1061,7 +1068,8 @@ public class CustomerImpl implements ICustomer {
         }
         catch(Exception ex){
             ex.printStackTrace();
-            return -1;
+            return "Failure";
+//                        return -1;
         }
     }
 }
