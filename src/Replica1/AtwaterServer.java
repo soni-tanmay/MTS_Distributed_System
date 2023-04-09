@@ -20,7 +20,7 @@ public class AtwaterServer {
         try{
             CustomerImpl atwClient = new CustomerImpl("ATWATER",atwaterLogger);
             System.out.println("Atwater Server Started!");
-            Endpoint ep = Endpoint.publish("http://localhost:8080/ATWATER",atwClient);
+            Endpoint ep = Endpoint.publish("http://localhost:8280/ATWATER",atwClient);
 
 
 //        int atwVerPortNum = 4200;
@@ -33,51 +33,51 @@ public class AtwaterServer {
             //make static hashmap
             atwClient.movies.put("AVATAR",new ConcurrentHashMap<String, MovieData>(){
                 {
-                    put("ATWM230323", new MovieData(8));
+                    put("ATWM130423", new MovieData(8));
                 }
             });
-            atwClient.movies.get("AVATAR").put("ATWM240323",new MovieData(15));
-            atwClient.movies.get("AVATAR").put("ATWM250323",new MovieData(13));
-            atwClient.movies.get("AVATAR").put("ATWE250323",new MovieData(18));
+            atwClient.movies.get("AVATAR").put("ATWM140423",new MovieData(15));
+            atwClient.movies.get("AVATAR").put("ATWM150423",new MovieData(13));
+            atwClient.movies.get("AVATAR").put("ATWE150423",new MovieData(18));
             ArrayList<String> c = new ArrayList<>();
             c.add("ATWC7777");
             c.add("VERC7777");
             c.add("OUTC7777");
-            atwClient.movies.get("AVATAR").get("ATWM230323").customers = c;
+            atwClient.movies.get("AVATAR").get("ATWM130423").customers = c;
 
 
             atwClient.movies.put("AVENGERS",new ConcurrentHashMap<String, MovieData>(){
                 {
-                    put("ATWA230323", new MovieData(4));
+                    put("ATWA130423", new MovieData(4));
                 }
             });
-            atwClient.movies.get("AVENGERS").put("ATWM240323",new MovieData(7));
-            atwClient.movies.get("AVENGERS").put("ATWM250323",new MovieData(5));
+            atwClient.movies.get("AVENGERS").put("ATWM140423",new MovieData(7));
+            atwClient.movies.get("AVENGERS").put("ATWM150423",new MovieData(5));
             ArrayList<String> customers = new ArrayList<>();
             customers.add("ATWC7777");
-            atwClient.movies.get("AVENGERS").get("ATWM240323").customers = customers;
+            atwClient.movies.get("AVENGERS").get("ATWM140423").customers = customers;
 
             atwClient.movies.put("TITANIC",new ConcurrentHashMap<String, MovieData>(){
                 {
-                    put("ATWE230323", new MovieData(6));
+                    put("ATWE130423", new MovieData(6));
                 }
             });
-            atwClient.movies.get("TITANIC").put("ATWA250323",new MovieData(8));
+            atwClient.movies.get("TITANIC").put("ATWA150423",new MovieData(8));
 
             //populate data for ATWC7777
             ArrayList<CustomerData> shows = new ArrayList<>();
-            shows.add(new CustomerData("AVATAR","ATWM230323",3));
-            shows.add(new CustomerData("AVENGERS","ATWM240323",2));
+            shows.add(new CustomerData("AVATAR","ATWM130423",3));
+            shows.add(new CustomerData("AVENGERS","ATWM140423",2));
             atwClient.customerBookings.put("ATWC7777", shows);
 
             //populate data for VERC7777
             ArrayList<CustomerData> shows1 = new ArrayList<>();
-            shows1.add(new CustomerData("AVATAR","ATWM230323",1));
+            shows1.add(new CustomerData("AVATAR","ATWM130423",1));
             atwClient.customerBookings.put("VERC7777", shows1);
 
             //populate data for OUTC7777
             ArrayList<CustomerData> shows2 = new ArrayList<>();
-            shows2.add(new CustomerData("AVATAR","ATWM230323",1));
+            shows2.add(new CustomerData("AVATAR","ATWM130423",1));
             atwClient.customerBookings.put("OUTC7777", shows2);
 
             System.out.println("customerBookings: " + atwClient.customerBookings);
