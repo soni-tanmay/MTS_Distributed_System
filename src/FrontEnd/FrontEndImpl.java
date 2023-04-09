@@ -120,14 +120,12 @@ public class FrontEndImpl implements  IFrontEnd{
             System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
 
-            while(true){
-                byte[] responseData = new byte[4096];
-                DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
-                datagramSocket.receive(responseDp);
-                String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
-                System.out.println("Received msg from Sequencer: " + response);
-//                datagramSocket.close();
-            }
+            byte[] responseData = new byte[4096];
+            DatagramPacket responseDp = new DatagramPacket(responseData, responseData.length);
+            datagramSocket.receive(responseDp);
+            String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
+            System.out.println("Received msg from Sequencer: " + response);
+            datagramSocket.close();
 
         }catch (Exception e){
             e.printStackTrace();

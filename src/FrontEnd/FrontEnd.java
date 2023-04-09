@@ -2,6 +2,8 @@ package FrontEnd;
 import Utils.Log;
 
 import javax.xml.ws.Endpoint;
+import java.util.concurrent.Executor;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 
 public class FrontEnd {
@@ -15,6 +17,10 @@ public class FrontEnd {
             FrontEndImpl implementation = new FrontEndImpl(log);
             Endpoint endpoint = Endpoint.publish("http://localhost:8080/"+ "frontend", implementation);
             System.out.println("frontend is published: " + endpoint.isPublished());
+
+            Runnable thread = new FEThread();
+            Executor executor = Executors.newFixedThreadPool(1);
+            executor.execute(thread);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEnd: " + e);
