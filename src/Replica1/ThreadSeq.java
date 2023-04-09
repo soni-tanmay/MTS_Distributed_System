@@ -1,51 +1,46 @@
 package Replica1;
 
+import Utils.Constants;
 import Utils.Log;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
+import java.net.MulticastSocket;
 
 public class ThreadSeq implements Runnable{
     private String sequencerIP = "";
-    private CustomerImpl serverInstance;
     private Log logger;
     private int portNum;
 
-    public ThreadSeq(int portNum, Log logger, CustomerImpl serverInstance){
-        this.portNum = portNum;
+//    public ThreadSeq(int portNum, Log logger, CustomerImpl serverInstance){
+//        this.portNum = portNum;
+//        this.logger = logger;
+//        this.serverInstance = serverInstance;
+//    }
+
+    public ThreadSeq(Log logger) {
         this.logger = logger;
-        this.serverInstance = serverInstance;
     }
 
     @Override
     public void run() {
-        DatagramSocket ds = null;
+        MulticastSocket ms = null;
         try {
+            ms = new MulticastSocket(Constants.multicastSocket);
+            InetAddress group = InetAddress.getByName(Constants.NetworkIP);
+            ms.joinGroup(group);
             while(true){
-                System.out.println("Thread started from server: " + serverInstance);
-                logger.logger.info("Thread started from server: " + serverInstance);
-                ds = new DatagramSocket(portNum);
-                logger.logger.info("Datagram socket opened on IP: " + sequencerIP);
+                System.out.println("Thread started from RM1");
                 byte[] req = new byte[1024];
-
-                DatagramPacket dp = new DatagramPacket(req,req.length);
-
-                ds.receive(dp);
-                logger.logger.info("Received datagram packet");
-                String reqMsg = new String(dp.getData()).trim();
+                DatagramPacket dp = new DatagramPacket(req, req.length);
+                ms.receive(dp);
+                this.logger.logger.info("Received datagram packet");
+                String reqMsg = (new String(dp.getData())).trim();
                 System.out.println("in thread reqMsg: " + reqMsg);
-
-                byte[] response = "Response from RM".getBytes();
-//                        serverInstance.getMyData(reqMsg);
-                InetAddress ina = InetAddress.getLocalHost();
-                DatagramPacket dpresp = new DatagramPacket(response,response.length,ina,dp.getPort());
-
-                ds.send(dpresp);
-                logger.logger.info("Datagram packet response sent.");
-                System.out.println("Thread response sent from " + serverInstance);
-                ds.close();
-                logger.logger.info("Datagram Socket closed.");
+                this.logger.logger.info("Datagram packet response sent.");
+                ms.close();
+                this.logger.logger.info("Multicast Socket closed.");
             }
         }
         catch(Exception ex) {
