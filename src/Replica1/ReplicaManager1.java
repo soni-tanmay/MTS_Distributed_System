@@ -10,6 +10,7 @@ import java.net.MulticastSocket;
 
 public class ReplicaManager1 {
     static Log rmLogger;
+    static int seqCounter;
 //    private static String reqMsg;
     public ReplicaManager1() throws IOException {
         rmLogger = new Log("RM1");
@@ -63,7 +64,16 @@ public class ReplicaManager1 {
     }
 
     public static String processRequest(String reqMsg){
-        return "Response from Server";
+        if(reqMsg.isEmpty()) {
+            return "Failure";
+        }
+        String[] request = reqMsg.split("_");
+        seqCounter = Integer.parseInt(request[0]);
+        System.out.println("Split Request: ");
+        for(String s: request){
+            System.out.println(s);
+        }
+        return seqCounter + "_"+"Response from Server";
     }
 
     public static void sendResponseToFE(String response){
