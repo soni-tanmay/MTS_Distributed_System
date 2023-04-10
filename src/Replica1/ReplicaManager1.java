@@ -105,7 +105,6 @@ public class ReplicaManager1 {
             System.out.println(ex);
             ex.printStackTrace();
             rmLogger.logger.warning("Exception occurred: " + ex);
-
         }
         finally {
             System.out.println("Exit Server");
@@ -115,7 +114,7 @@ public class ReplicaManager1 {
     public static String processRequest(String reqMsg) throws MalformedURLException {
         System.out.println("Entered process Request");
         if(reqMsg.isEmpty()) {
-            return seqCounter + "_RM1_Failure";
+            return seqCounter + "-RM1-Failure";
         }
         String[] request = reqMsg.split("_");
         seqCounter = Integer.parseInt(request[0].trim());
@@ -125,7 +124,7 @@ public class ReplicaManager1 {
             System.out.println(s);
         }
         String replicaResponse = sendRequestToReplica(reqMsg); //ToDo send request to implementation
-        return seqCounter + "_RM1_" + replicaResponse;
+        return seqCounter + "-RM1-" + replicaResponse;
     }
 
     public static String sendRequestToReplica(String reqMsg) throws MalformedURLException {
