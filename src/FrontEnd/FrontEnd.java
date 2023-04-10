@@ -18,7 +18,7 @@ public class FrontEnd {
             Endpoint endpoint = Endpoint.publish("http://localhost:8080/"+ "frontend", implementation);
             System.out.println("frontend is published: " + endpoint.isPublished());
 
-            Runnable thread = new FEThread();
+            Runnable thread = new FEThread(implementation);
             Executor executor = Executors.newFixedThreadPool(1);
             executor.execute(thread);
         }catch (Exception e){

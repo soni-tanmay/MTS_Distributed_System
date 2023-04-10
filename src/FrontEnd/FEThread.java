@@ -6,6 +6,12 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class FEThread implements Runnable{
+
+    FrontEndImpl implementation;
+    public FEThread(FrontEndImpl implementation){
+        super();
+        this.implementation = implementation;
+    }
     @Override
     public void run() {
         try {
@@ -16,6 +22,7 @@ public class FEThread implements Runnable{
                 datagramSocket.receive(responseDp);
                 String response = new String(responseDp.getData(), responseDp.getOffset(), responseDp.getLength());
                 System.out.println("Received msg from Replica Manager: " + response);
+                implementation.responseRM(response);
                 datagramSocket.close();
             }
         } catch (Exception e) {
