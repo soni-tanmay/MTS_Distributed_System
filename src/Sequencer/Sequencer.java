@@ -69,7 +69,9 @@ public class Sequencer {
 
         // String resp = String.valueOf(seqNo);
         byte[] data = seqData.getBytes();
-            DatagramPacket resPacket = new DatagramPacket(data, data.length, InetAddress.getByName(Constants.FE_IP),  Constants.FEPort);
+//        DatagramPacket resPacket = new DatagramPacket(data, data.length, InetAddress.getByName(Constants.FE_IP),  Constants.FEPort);
+        //uncomment below line to run in own env
+        DatagramPacket resPacket = new DatagramPacket(data, data.length, InetAddress.getByName(Constants.FE_IP),  Constants.FEPort);
             System.out.println("resPacket " + resPacket);
             try {
                 socket.send(resPacket);

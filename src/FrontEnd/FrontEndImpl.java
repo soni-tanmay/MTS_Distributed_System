@@ -132,7 +132,9 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             DatagramSocket datagramSocket = new DatagramSocket(7001);
             byte[] requestData = request.getBytes();
-            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
+//            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
+            //uncomment below line to test in own system
+            DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), Constants.SQPort);
             System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
 
