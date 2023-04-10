@@ -20,7 +20,7 @@ public class AtwaterServer {
         try{
             CustomerImpl atwClient = new CustomerImpl("ATWATER",atwaterLogger);
             System.out.println("Atwater Server Started!");
-            Endpoint ep = Endpoint.publish("http://localhost:8280/ATWATER",atwClient);
+            Endpoint ep = Endpoint.publish("http://localhost:8083/ATWATER",atwClient);
 
 
 //        int atwVerPortNum = 4200;

@@ -4,3 +4,7 @@ Apr 10, 2023 1:44:50 AM Replica1.ReplicaManager1 getRequestFromSequencer
 WARNING: Exception occurred: java.net.SocketException: bad argument for IP_MULTICAST_IF2
 Apr 10, 2023 1:56:54 AM Replica1.ReplicaManager1 getRequestFromSequencer
 WARNING: Exception occurred: java.net.SocketException: bad argument for IP_MULTICAST_IF2
+Apr 10, 2023 2:13:16 AM Replica1.ReplicaManager1 getRequestFromSequencer
+WARNING: Exception occurred: java.net.SocketException: bad argument for IP_MULTICAST_IF2
+Apr 10, 2023 5:42:09 AM Replica1.ReplicaManager1 getRequestFromSequencer
+WARNING: Exception occurred: java.net.SocketException: bad argument for IP_MULTICAST_IF2

@@ -31,9 +31,37 @@ public class ReplicaManager1 {
             return "VERDUN";
         }
     }
+    private static String getPortNum(String server){
+        String portNum = "";
+        if(server.equals("ATWATER")){
+            portNum = "8083";
+        }
+        else if(server.equals("OUTREMONT")){
+            portNum = "8081";
+        }
+        else{
+            portNum = "8082";
+        }
+        return portNum;
+    }
+    private static void testRMFunctionality() throws MalformedURLException {
+        //1_addMovieSlots_ATWC5555_ATWM170423_TITANIC_10
+        //2_removeMovieSlots_ATWC5555_ATWM140423_AVATAR
+        //3_listMovieShowsAvailability_ATWC5555_TITANIC_true
+        //4_bookMovieTickets_ATWC5555_ATWM140423_AVATAR_8
+        //5_getBookingSchedule_ATWC5555_true
+        //6_cancelMovieTickets_ATWC5555_ATWM140423_AVATAR_5
+        //7_exchangeTickets_ATWC5555_ATWM140423_old_movieName_new_movieID_new_movieName_numberOfTickets
+        String reqMsg = "1_addMovieSlots_ATWC5555_ATWM140423_AVATAR_5";
+        String response = processRequest(reqMsg);
+        System.out.println("Test complete for " + reqMsg);
+        System.out.println(response);
+//        sendResponseToFE(response);
+    }
 
     public static void main(String[] args) throws IOException {
         rmLogger = new Log("RM1");
+//        testRMFunctionality();
         new Thread(
             () -> {
                 try{
@@ -51,9 +79,9 @@ public class ReplicaManager1 {
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
-            NetworkInterface networkInterface = NetworkInterface.getByName("en0");
-            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
-            ms.setNetworkInterface(networkInterface);
+//            NetworkInterface networkInterface = NetworkInterface.getByName("en0");
+//            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
+//            ms.setNetworkInterface(networkInterface);
 
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
@@ -84,8 +112,8 @@ public class ReplicaManager1 {
         }
     }
 
-
     public static String processRequest(String reqMsg) throws MalformedURLException {
+        System.out.println("Entered process Request");
         if(reqMsg.isEmpty()) {
             return seqCounter + "_RM1_Failure";
         }
@@ -100,63 +128,65 @@ public class ReplicaManager1 {
         return seqCounter + "_RM1_" + replicaResponse;
     }
 
-//1_addMovieSlots_movieID_movieName_bookingCapacity
-//2_removeMovieSlots_movieID_movieName
-//3_listMovieShowsAvailability_movieName_isClientCall
-//4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
-//5_getBookingSchedule_customerID_isClientCall
-//6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
-//7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
     public static String sendRequestToReplica(String reqMsg) throws MalformedURLException {
-
+        System.out.println("Entered sendRequestToReplica");
         URL url;
         QName qName;
         String[] params = reqMsg.split("_");
         String server = identifyClientServer(params[2].toString());
+        String portNum = getPortNum(server);
 
-        url = new URL("http://localhost:8080/" + server +"?wsdl");
-        qName = new QName("http://Replica1/", "CustomerService");
+        url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
+        qName = new QName("http://Replica1/", "CustomerImplService");
         Service service = Service.create(url,qName);
         clientObj = service.getPort(ICustomer.class);
 
         String response;
-//        switch (params[1]){
-//            case "addMovieSlots":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "removeMovieSlots":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "listMovieShowsAvailability":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "bookMovieTickets":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "getBookingSchedule":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "cancelMovieTickets":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//
-//            case "exchangeTickets":
-//                response = ;
-//                System.out.println("Response: " + response);
-//                return response;
-//        }
-        return "abcdResponse";
+        switch (params[1].trim()){
+            case "addMovieSlots":
+                //1_addMovieSlots_customerID_movieID_movieName_bookingCapacity
+                response = clientObj.addMovieSlots(params[3],params[4],Integer.parseInt(params[5]));
+                System.out.println("Response: " + response);
+                return response;
+
+            case "removeMovieSlots":
+                //2_removeMovieSlots_customerID_movieID_movieName
+                response = clientObj.removeMovieSlots(params[3],params[4]);
+                System.out.println("Response: " + response);
+                return response;
+
+            case "listMovieShowsAvailability":
+                //3_listMovieShowsAvailability_customerID_movieName_isClientCall
+                response = clientObj.listMovieShowsAvailability(params[3],Boolean.parseBoolean(params[4]));
+                System.out.println("Response: " + response);
+                return response;
+
+            case "bookMovieTickets":
+                //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
+                response = clientObj.bookMovieTickets(params[2],params[3],params[4],Integer.parseInt(params[5]));
+                System.out.println("Response: " + response);
+                return response;
+
+            case "getBookingSchedule":
+                //5_getBookingSchedule_customerID_isClientCall
+                response = clientObj.getBookingSchedule(params[2],Boolean.parseBoolean(params[3]));
+                System.out.println("Response: " + response);
+                return response;
+
+            case "cancelMovieTickets":
+                //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
+                response = clientObj.cancelMovieTickets(params[2],params[3],params[4],Integer.parseInt(params[5]));
+                System.out.println("Response: " + response);
+                return response;
+
+            case "exchangeTickets":
+                //7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
+                response = clientObj.exchangeTickets(params[2],params[3],params[4],params[5],params[6],Integer.parseInt(params[7]));
+                System.out.println("Response: " + response);
+                return response;
+
+        }
+        return null;
     }
 
     public static void sendResponseToFE(String response){
@@ -164,9 +194,9 @@ public class ReplicaManager1 {
         try{
             ds = new DatagramSocket(Constants.RM1Port);
             byte[] req = response.getBytes();
-//            InetAddress ia = InetAddress.getByName(Constants.FE_IP);
+            InetAddress ia = InetAddress.getByName(Constants.FE_IP);
             //uncomment below line to test on own env
-            InetAddress ia = InetAddress.getLocalHost();
+//            InetAddress ia = InetAddress.getLocalHost();
             DatagramPacket dp = new DatagramPacket(req,req.length,ia,Constants.FEResPort);
             ds.send(dp);
             rmLogger.logger.info("Datagram packet sent to port " + Constants.FEResPort);

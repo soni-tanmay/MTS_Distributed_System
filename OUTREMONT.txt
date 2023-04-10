@@ -1,0 +1,14 @@
+Apr 10, 2023 5:33:12 AM Replica1.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 10, 2023 5:33:12 AM Replica1.OutremontServer main
+WARNING: Exception occurred: com.sun.xml.internal.ws.server.ServerRtException: Server Runtime Error: java.net.BindException: Address already in use: bind
+Apr 10, 2023 5:40:22 AM Replica1.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 10, 2023 5:40:22 AM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@7ce15307
+Apr 10, 2023 5:40:22 AM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@7ce15307
+Apr 10, 2023 5:40:22 AM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4201
+Apr 10, 2023 5:40:22 AM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4205
