@@ -478,7 +478,7 @@ public class Client {
                             Response res = clientObj.listMovieShowsAvailability(movieName, true);
                             if(res.StatusCode == 200) {
                                 // String[] shows = res.split("~");
-                                if(res.body.isEmpty()){
+                                if(res.body.isEmpty() && res.body == null){
                                     System.out.println("There are no shows for this movie");
                                 }
                                 else {
