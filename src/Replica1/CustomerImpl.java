@@ -533,6 +533,7 @@ public class CustomerImpl implements ICustomer {
         String result = "";
         System.out.println("available Shows: " + availableShows);
         if(!availableShows.isEmpty()){
+            Collections.sort(availableShows);
             for (String show: availableShows){
                 System.out.println("Result: " + result);
                 result = result.concat(show.trim() + "_");
@@ -769,6 +770,7 @@ public class CustomerImpl implements ICustomer {
         String result = "";
         System.out.println("available Shows: " + bookingSchedule);
         if(!bookingSchedule.isEmpty()){
+            Collections.sort(bookingSchedule);
             for (String show: bookingSchedule){
                 System.out.println("Result: " + result);
                 result = result.concat(show.trim() + "_");

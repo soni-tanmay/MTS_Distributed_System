@@ -34,8 +34,9 @@ public class ThreadCall implements Runnable {
                 String reqMsg = new String(dp.getData()).trim();
                 System.out.println("in thread reqMsg: " + reqMsg);
 
-                byte[] response = "Response from RM".getBytes();
-//                serverInstance.getMyData(reqMsg);
+                byte[] response =
+//                        "Response from RM".getBytes();
+                serverInstance.getMyData(reqMsg);
                 InetAddress ina = InetAddress.getLocalHost();
                 DatagramPacket dpresp = new DatagramPacket(response,response.length,ina,dp.getPort());
 

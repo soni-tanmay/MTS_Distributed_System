@@ -79,7 +79,7 @@ public class ReplicaManager1 {
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
-//            NetworkInterface networkInterface = NetworkInterface.getByName("en0");
+//            NetworkInterface networkInterface = NetworkInterface.getByName("eth0");
 //            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
 //            ms.setNetworkInterface(networkInterface);
 
@@ -118,7 +118,7 @@ public class ReplicaManager1 {
             return seqCounter + "_RM1_Failure";
         }
         String[] request = reqMsg.split("_");
-        seqCounter = Integer.parseInt(request[0]);
+        seqCounter = Integer.parseInt(request[0].trim());
         //ToDo verify if correct
         System.out.println("Split Request: ");
         for(String s: request){
@@ -133,7 +133,7 @@ public class ReplicaManager1 {
         URL url;
         QName qName;
         String[] params = reqMsg.split("_");
-        String server = identifyClientServer(params[2].toString());
+        String server = identifyClientServer(params[2].trim().toString());
         String portNum = getPortNum(server);
 
         url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
@@ -145,43 +145,43 @@ public class ReplicaManager1 {
         switch (params[1].trim()){
             case "addMovieSlots":
                 //1_addMovieSlots_customerID_movieID_movieName_bookingCapacity
-                response = clientObj.addMovieSlots(params[3],params[4],Integer.parseInt(params[5]));
+                response = clientObj.addMovieSlots(params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "removeMovieSlots":
                 //2_removeMovieSlots_customerID_movieID_movieName
-                response = clientObj.removeMovieSlots(params[3],params[4]);
+                response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim());
                 System.out.println("Response: " + response);
                 return response;
 
             case "listMovieShowsAvailability":
                 //3_listMovieShowsAvailability_customerID_movieName_isClientCall
-                response = clientObj.listMovieShowsAvailability(params[3],Boolean.parseBoolean(params[4]));
+                response = clientObj.listMovieShowsAvailability(params[3].trim(),Boolean.parseBoolean(params[4].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "bookMovieTickets":
                 //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
-                response = clientObj.bookMovieTickets(params[2],params[3],params[4],Integer.parseInt(params[5]));
+                response = clientObj.bookMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "getBookingSchedule":
                 //5_getBookingSchedule_customerID_isClientCall
-                response = clientObj.getBookingSchedule(params[2],Boolean.parseBoolean(params[3]));
+                response = clientObj.getBookingSchedule(params[2].trim(),Boolean.parseBoolean(params[3].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "cancelMovieTickets":
                 //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
-                response = clientObj.cancelMovieTickets(params[2],params[3],params[4],Integer.parseInt(params[5]));
+                response = clientObj.cancelMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "exchangeTickets":
                 //7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
-                response = clientObj.exchangeTickets(params[2],params[3],params[4],params[5],params[6],Integer.parseInt(params[7]));
+                response = clientObj.exchangeTickets(params[2].trim(),params[3].trim(),params[4].trim(),params[5].trim(),params[6].trim(),Integer.parseInt(params[7].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
