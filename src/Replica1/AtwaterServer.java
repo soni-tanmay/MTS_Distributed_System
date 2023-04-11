@@ -12,7 +12,7 @@ public class AtwaterServer {
 
     public static void main(String[] args) throws Exception {
 
-        Log atwaterLogger = new Log("ATWATER.txt");
+        Log atwaterLogger = new Log("ATWATER-RM-1.txt");
         atwaterLogger.logger.setLevel(Level.ALL);
         atwaterLogger.logger.setUseParentHandlers(false);
         atwaterLogger.logger.info("ATWATER Server started.");

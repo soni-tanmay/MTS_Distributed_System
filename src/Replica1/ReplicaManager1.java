@@ -133,10 +133,11 @@ public class ReplicaManager1 {
     }
 
     public static void switchReplica(){
-
+        System.out.println("Switching replica");
     }
 
     public static void restartReplica() throws Exception {
+        System.out.println("Restarting replica due to fault");
         String []args = {"",""};
         AtwaterServer.main(args);
         OutremontServer.main(args);

@@ -15,7 +15,7 @@ public class VerdunServer {
 
     static void configureRMIConnection() throws Exception {
 
-        Log verdunLogger = new Log("VERDUN.txt");
+        Log verdunLogger = new Log("VERDUN-RM-1.txt");
         verdunLogger.logger.setLevel(Level.ALL);
         verdunLogger.logger.setUseParentHandlers(false);
         verdunLogger.logger.info("VERDUN Server started.");

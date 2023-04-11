@@ -11,7 +11,7 @@ import java.util.logging.Level;
 public class OutremontServer {
     public static void main(String[] args) throws Exception {
 //        configureRMIConnection();
-        Log outLogger = new Log("OUTREMONT.txt");
+        Log outLogger = new Log("OUTREMONT-RM-1.txt");
         outLogger.logger.setLevel(Level.ALL);
         outLogger.logger.setUseParentHandlers(false);
         outLogger.logger.info("OUTREMONT Server started.");
