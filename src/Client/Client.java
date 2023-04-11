@@ -427,7 +427,7 @@ public class Client {
                             }
                             System.out.println("Please enter booking capacity");
                             bookingCapacity = getNumTickets();
-                            int res = clientObj.addMovieSlots(movieId,movieName,bookingCapacity).StatusCode;
+                            int res = clientObj.addMovieSlots(userid,movieId,movieName,bookingCapacity).StatusCode;
                             clientLogger.logger.info("Request sent to server");
                             clientLogger.logger.info("Params: " + movieName + " " + movieId + " " + bookingCapacity);
                             if(res == 200){
@@ -455,7 +455,7 @@ public class Client {
                             }
                             clientLogger.logger.info("Request sent to server with params: " + movieName + " " + movieId);
 
-                            int res = clientObj.removeMovieSlots(movieId, movieName).StatusCode;
+                            int res = clientObj.removeMovieSlots(userid,movieId, movieName).StatusCode;
                             if(res == 200){
                                 System.out.println("Slots removed successfully");
                             }
@@ -475,7 +475,7 @@ public class Client {
                             System.out.println("Please enter the movie name");
                             movieName = getMovieName();
                             clientLogger.logger.info("Request sent to server");
-                            Response res = clientObj.listMovieShowsAvailability(movieName, true);
+                            Response res = clientObj.listMovieShowsAvailability(userid,movieName, true);
                             if(res.StatusCode == 200) {
                                 // String[] shows = res.split("~");
                                 if(res.body.isEmpty() && res.body == null){

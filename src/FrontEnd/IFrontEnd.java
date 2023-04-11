@@ -8,11 +8,11 @@ import javax.jws.soap.SOAPBinding;
 @SOAPBinding(style= SOAPBinding.Style.RPC)
 public interface IFrontEnd {
     @WebMethod()
-    Response addMovieSlots (String movieID, String movieName, int bookingCapacity);
+    Response addMovieSlots (String customerID, String movieID, String movieName, int bookingCapacity);
     @WebMethod()
-    Response removeMovieSlots (String movieID, String movieName);
+    Response removeMovieSlots (String customerID, String movieID, String movieName);
     @WebMethod()
-    Response listMovieShowsAvailability (String movieName, boolean isClientCall);
+    Response listMovieShowsAvailability (String customerID, String movieName, boolean isClientCall);
     @WebMethod()
     Response bookMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets);
     @WebMethod()

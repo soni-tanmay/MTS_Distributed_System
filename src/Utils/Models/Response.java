@@ -10,4 +10,6 @@ public class Response {
         this.StatusCode = StatusCode;
         this.body = body;
     }
+
+    public Response() {}
 }
