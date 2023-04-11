@@ -23,7 +23,7 @@ public class AtwaterServer {
         
 
         BookingImplementation atw = new BookingImplementation("ATW", atwaterLogger);
-		Endpoint endpoint = Endpoint.publish("http://localhost:8080/atwater", atw);
+		Endpoint endpoint = Endpoint.publish("http://localhost:8083/ATWATER", atw);
 
         Thread UDPCommunicator = new Thread(){
             public void run() {           

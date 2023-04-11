@@ -101,109 +101,54 @@ public class BookingImplementation implements BookingInterface{
 
     }
 
-    @Override
-    public String removeMovieSlots(String movieID, String movieName) {
-        logInfo.logger.info("Removing moving slots for " + movieID + " " + movieName);
-        if(movies.get(movieName) == null) {
-            logInfo.logger.info("Error occurred! Please enter a valid movie name");
-            return "Failure";
-        }
-        if(movies.get(movieName).get(movieID) == null) {
-            logInfo.logger.info("Error occurred! Please enter a valid movie id");
-            return "Failure";
-        }
-        ArrayList<String> custIds = new ArrayList<>();
-        custIds = movies.get(movieName).get(movieID).cust_ids;
-        int targetMovieCapacity = movies.get(movieName).get(movieID).capacity;
-
-        ConcurrentHashMap<String, Integer> customersToBeRescheduled = new ConcurrentHashMap<>();
-
-        int ticketsToBeRemoved = 0;
-         for (Map.Entry<String, ArrayList<Customer>> mapElement : customers.entrySet()) {
-             String customerId = mapElement.getKey();
-             ArrayList<Customer> listOfCustomerMovies = mapElement.getValue();
-
-             for(Customer cData: listOfCustomerMovies) {
-                 if(cData.movieName.equals(movieName) && cData.movieId.equals(movieID)){
-                     ticketsToBeRemoved = ticketsToBeRemoved + cData.bookedTickets;
-                     customersToBeRescheduled.put(customerId, cData.bookedTickets);
-                     customers.get(customerId).remove(cData);
-                     break;
-                 }
-             }
-         }
-
-        if(ticketsToBeRemoved > 0) {
-            ArrayList<String> availableShows =  new ArrayList<String>(Arrays.asList(listMovieShowsAvailability(movieName, false)));
-
-            TreeMap<String, Integer> availableSlots = new TreeMap<>(new Comparator<String>() {
-            @Override
-            public int compare(String o1, String o2) { // "ATWM090823"
-                String dateString1 = o1.substring(4, 10);
-                String dateString2 = o2.substring(4, 10);
-
-                SimpleDateFormat date1 = new SimpleDateFormat("ddMMyy");
-                try {
-                    Integer res = date1.parse(dateString1).compareTo(date1.parse(dateString2));
-                    if(res == 0) {
-                        // M A E
-                        Character[] timimgs = {'M', 'A', 'E'};
-
-                        return Arrays.asList(timimgs).indexOf(o1.charAt(3)) > Arrays.asList(timimgs).indexOf(o1.charAt(3)) ? 1 : -1;
-                    } else {
-                        return res > 0 ? 1 : -1;
+    public String removeMovieSlots(String movieID, String movieName, boolean isClientCall) {
+        try{
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
+            LocalDate todayDate = LocalDate.now();
+            LocalDate movieDate = LocalDate.parse(movieID.substring(4),formatter);
+            if(!movieID.contains(serverId) || movies.get(movieName)==null || movies.get(movieName).isEmpty() || movies.get(movieName).get(movieID)== null|| !movieDate.isAfter(todayDate)){
+                System.out.println("removeMovieSlots: Unauthorised request");
+                logInfo.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | completed | " + "Unauthorised request");
+                return "Unauthorised request";
+            }
+            if(movies.get(movieName).get(movieID).cust_ids == null || movies.get(movieName).get(movieID).cust_ids.isEmpty() || movies.get(movieName).get(movieID).cust_ids.size()==0){
+                movies.get(movieName).remove(movieID);
+            }else {
+                for (String e : movies.get(movieName).get(movieID).cust_ids){
+                    for (Customer c : customers.get(e)){
+                        if(c.movieId.equals(movieID)){
+                            String nextMovieSlot= movieID;
+                            LocalDate nextMovieDate = movieDate;
+                            LocalDate lastMovieSlot = LocalDate.now().plusDays(7);
+                            while(lastMovieSlot.isAfter(nextMovieDate)){
+                                if(nextMovieSlot.charAt(3)=='M'){
+                                    nextMovieSlot = nextMovieSlot.substring(0,3)+"A"+nextMovieSlot.substring(4);
+                                } else if (nextMovieSlot.charAt(3)=='A') {
+                                    nextMovieSlot = nextMovieSlot.substring(0,3)+"E"+nextMovieSlot.substring(4);
+                                }else {
+                                    nextMovieDate = nextMovieDate.plusDays(1);
+                                    nextMovieSlot = nextMovieSlot.substring(0,3)+"M"+nextMovieDate.format(formatter);
+                                }
+                                String result = bookMovieTickets(e,nextMovieSlot,movieName,c.bookedTickets, true);
+                                if(result.equals("Successfully booked")){
+                                    break;
+                                }
+                            }
+                            customers.get(e).remove(c);
+                            break;
+                        }
                     }
-
-                } catch (ParseException e) {
-                    throw new RuntimeException(e);
                 }
+                movies.get(movieName).remove(movieID);
             }
-        });
-
-        // loop availableShows then take "ATWM080923 8" => split => availableSlots.put(item.split(" ")[0], Integer.prseInt(item.split(" ")[1]))
-        for(String as: availableShows) {
-            availableSlots.put(as.split(" ")[0], Integer.parseInt(as.split(" ")[1]));
+            System.out.println("removeMovieSlots: Removed slot successfully");
+            logInfo.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | completed | " + "Removed slot successfully");
+            return "Removed slot successfully";
+        }catch (Exception e){
+            System.out.println("removeMovieSlots: "+e);
+            logInfo.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | failed | " + e);
+            return e.toString();
         }
-
-        Map.Entry<String, Integer>[] availableSlotsList = availableSlots.entrySet().toArray(new Map.Entry[availableSlots.size()]);
-
-        // -- check --
-        Map.Entry<String, Integer> entry = new AbstractMap.SimpleEntry<String, Integer>(movieID, targetMovieCapacity);
-
-        int targetSlotIndex = Arrays.asList(availableSlotsList).indexOf(entry);
-
-        int movieSlotsLength = Arrays.asList(availableSlotsList).size();
-        if(targetSlotIndex + 1 == movieSlotsLength) {
-            // logger
-            movies.get(movieName).remove(movieID);
-            logInfo.logger.info("No other slots available. Please refund the amount to customers as the slot has been removed");
-            return "No other slots available. Please refund the amount to customers";
-        }
-
-        boolean booked = false;
-        // Book for all customers at once or dont book at all
-        for(int i=targetSlotIndex + 1; i<movieSlotsLength; i++) {
-            if(availableSlotsList[i].getValue() >= ticketsToBeRemoved) {
-                for(Map.Entry<String, Integer> c: customersToBeRescheduled.entrySet()) {
-                    bookMovieTickets(c.getKey(), availableSlotsList[i].getKey(), movieName, c.getValue(), false);
-                }
-                booked = true;
-                break;
-            }
-        }
-
-        if(!booked) {
-            // logger
-            movies.get(movieName).remove(movieID);
-            logInfo.logger.info("No other slots available. Please refund the amount to customers as the slot has been removed");
-            return "No other slots available. Please refund the amount to customers";
-        }}
-
-        movies.get(movieName).remove(movieID);
-
-        // logger
-        logInfo.logger.info("Removed Movie Slot! " + LocalDateTime.now());
-        return "Success";
     }
 
     private ArrayList<String> getPort(String serverId) {
@@ -688,95 +633,149 @@ public class BookingImplementation implements BookingInterface{
 
 
     @Override
-    public String exchangeTickets(String customerID, String curr_movieID, String new_movieID, String new_movieName, int numberOfTickets) {
-        try {
-            ArrayList<String> allBookings = new ArrayList<String>(Arrays.asList(getBookingSchedule(customerID, true)));
+    public String exchangeTickets(String customerID, String old_movieName, String movieID, String new_movieID, String new_movieName, int numberOfTickets) {
+        try{
+            logInfo.logger.info("Entered exchangeTickets() with params: " + "customerID: " + customerID + ", old_movieName: " + old_movieName + ", movieID:  " + movieID + ", new_movieID:  " + new_movieID + ", new_movieName: " + new_movieName + ", numberOfTickets: " + numberOfTickets);
+            String oldLocation = movieID.toUpperCase().substring(0,3);
+            String newLocation = new_movieID.toUpperCase().substring(0,3);
+            String userLocation = customerID.toUpperCase().substring(0,3);
+            String isBooked, isCancelled;
 
-            boolean flag = false;
-            String booking = "";
-
-            for(String sched : allBookings) {
-                // movieName.equals(sched.split(" ")[0]) && 
-                if(curr_movieID.equals(sched.split(" ")[1])) {
-                    if(Integer.parseInt(sched.split(" ")[2]) >= numberOfTickets) {
-                        flag = true;
-                        booking = sched;
-                        break; 
-                    } else {
-                        logInfo.logger.info("You have booked only " + Integer.parseInt(sched.split(" ")[2]) + " tickets. So, you cannot exchange " + numberOfTickets + " tickets");
-                        return "Failure";
+            //check if home theater for new show
+            if(newLocation.equals(userLocation)){
+                //book, cancel, cancel
+                isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets, true);
+                if(isBooked.equals("Success")){
+                    isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                    if(isCancelled.equals("Success")){
+                        logInfo.logger.info("Tickets exchanged successfully. Transaction complete");
+                        return "Success";
+//                        return 0;
                     }
-                } 
-            }
-
-            if(!!flag) {
-                String[] listAvailableMovies = listMovieShowsAvailability(new_movieName, true);
-                for(String movieDetails: listAvailableMovies) {
-                    if(movieDetails.split(" ")[0].equals(new_movieID)) {
-
-                        if(Integer.parseInt(movieDetails.split(" ")[1]) >= numberOfTickets) {
-							if(isExchangePossible(customerID, new_movieID, new_movieName, numberOfTickets, true, curr_movieID)) {
-								String result = cancelMovieTickets(customerID, curr_movieID, booking.split(" ")[0], numberOfTickets, true);
-
-								if(result.trim().contains("Success")) {
-									String success = bookMovieTickets(customerID, new_movieID, new_movieName, numberOfTickets, true);
-
-									if(success.trim().equals("Success")) {
-										// return "You have successfully exchanged the tickets";
-                                        return "Success";
-									} else {
-										logInfo.logger.info(success);
-										
-										return success;
-								   }
-								}
-
-							}
-                        //    String success = bookMovieTickets(customerID, new_movieID, new_movieName, numberOfTickets, true);
-                        //    // not cancelling
-                        //    System.out.println("success - " + success);
-
-                        //    System.out.println("### " + success.trim().equals("Movie booked successfully!"));
-                        //    if(success.trim().equals("Movie booked successfully!")) {
-                        //         // cancel old tickets 
-                        //         String result = cancelMovieTickets(customerID, curr_movieID, booking.split(" ")[0], numberOfTickets, true);
-
-                        //         if(result.trim().equals("Cancelled movie tickets successfully")) {
-                        //             logInfo.logger.info("You have successfully exchanged the tickets");
-
-                        //             return "You have successfully exchanged the tickets";
-                        //         }
-                        //    } else {
-                        //         logInfo.logger.info(success);
-                                
-                        //         return success;
-                        //    }
-                        } else {
-                            // no capacity
-                            logInfo.logger.info("Not enough capacity left in " + new_movieID + " " + new_movieName);
-
-                            // return "Not enough capacity left in " + new_movieID + " " + new_movieName;
+                    else{
+                        logInfo.logger.info("Could not cancel previous ticket.");
+                        String res = cancelMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets, true);
+                        if(res.equals("Success")){
                             return "Failure";
+//                        return -1;
                         }
-                    } else {
-                        logInfo.logger.info("No shows for " + new_movieName + " " + new_movieID);
-                        // - not checking for second movie
-                        // return "No shows for " + new_movieName + " " + new_movieID;
+                        return "Failure";
+//                        return -1;
                     }
                 }
-            } else {
-                logInfo.logger.info("You have not booked any tickets for this show ");
-
-                // return "You have not booked any tickets for this show ";
+                logInfo.logger.info("Could not book ticket. Transaction failed");
                 return "Failure";
+//                        return -1;
             }
-        } catch (Exception e) {
-            System.out.println("Exception in exchange tickets " + e);
-            e.printStackTrace();
-        }
 
-        return "";
+            //check if both shows in same location
+            if(newLocation.equals(oldLocation)){
+                //cancel, book, book
+                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                if(isCancelled.equals("Success")){
+                    System.out.println("Movie successfully cancelled. Proceeding to book ticket");
+                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets, true);
+                    if(isBooked.equals("Success")){
+                        System.out.println("Movie successfully booked. Transaction successful");
+                        logInfo.logger.info("Movie successfully booked. Transaction successful");
+                        return "Success";
+//                        return 0;
+                    }
+                    else{
+                        String res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                        if(res.equals("Success")){
+                            logInfo.logger.info("Could not book ticket. Transaction reversed.");
+                            return "Failure";
+//                        return -1;
+                        }
+                        return "Failure";
+//                        return -1;
+                    }
+                }
+                logInfo.logger.info("Could not cancel ticket. Exchange could not be performed.");
+                return "Failure";
+//                        return -1;
+            }
+
+            //check if both in other servers
+            if(!newLocation.equals(userLocation) && !oldLocation.equals(userLocation)){
+                //cancel, book, book
+                // or
+                //get booking schedule, check bookings and num of tickets
+                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                if(isCancelled.equals("Success")){
+                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets, true);
+                    if(isBooked.equals("Success")){
+                        logInfo.logger.info("Exchange of tickets successful. Transaction complete.");
+                        return "Success";
+//                        return 0;
+                    }
+                    else {
+                        String res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                        if(res.equals("Success")){
+                            System.out.println("Could not book ticket. Transaction reversed.");
+                            logInfo.logger.info("Could not book ticket. Transaction reversed.");
+                            return "Failure";
+//                        return -1;
+                        }
+                        return "Failure";
+//                        return -1;
+                    }
+                }
+                logInfo.logger.info("Could not cancel previous ticket. Transaction failed.");
+                return "Failure";
+//                        return -1;
+            }
+            else {
+                isCancelled = cancelMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                if(isCancelled.equals("Success")){
+                    isBooked = bookMovieTickets(customerID,new_movieID,new_movieName,numberOfTickets, true);
+                    if(isBooked.equals("Success")){
+                        logInfo.logger.info("Exchange of tickets successful. Transaction complete.");
+                        return "Success";
+//                        return 0;
+                    }
+                    else {
+                        String res = bookMovieTickets(customerID,movieID,old_movieName,numberOfTickets, true);
+                        if(res.equals("Success")){
+                            System.out.println("Could not book ticket. Transaction reversed.");
+                            logInfo.logger.info("Could not book ticket. Transaction reversed.");
+                            return "Failure";
+//                        return -1;
+                        }
+                        return "Failure";
+//                        return -1;
+                    }
+                }
+                logInfo.logger.info("Could not cancel previous ticket. Transaction failed.");
+                return "Failure";
+//                        return -1;
+            }
+
+//            System.out.println("Unhandled scenario reached.");
+//            logger.logger.warning("Unhandled scenario reached.");
+
+//            //check if one in main server and other in other location
+//            int isCancellable = -1;
+//            int isBookable = isBooked(customerID, new_movieID, new_movieName, numberOfTickets);
+//            if(isBookable == 0){
+//                isCancellable = isCancelled(customerID,movieID, old_movieName, numberOfTickets);
+//                if(isCancellable == 0){
+//                    return 0;
+//                }
+//                else {
+//                    //cancel booked tickets
+//                }
+//            }
+//            return 1;
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+            return "Failure";
+//                        return -1;
+        }
     }
+
 
     public ArrayList<String> mapFunction(String functionNameWithParameters, Log logInfo) {
         ArrayList<String> result = new ArrayList<>();

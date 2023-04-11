@@ -26,7 +26,7 @@ public class OutrementServer {
         // logInfo.logger.setLevel(Level.ALL);
 
         BookingImplementation out = new BookingImplementation("OUT", outrementLogger);
-		Endpoint endpoint = Endpoint.publish("http://localhost:8082/outrement", out);
+		Endpoint endpoint = Endpoint.publish("http://localhost:8081/OUTREMONT", out);
 
         Thread UDPCommunicator = new Thread(){
             public void run() {           

@@ -13,14 +13,15 @@ public interface BookingInterface {
 
 
 	public String addMovieSlots (String movieID, String movieName, int bookingCapacity) throws RemoteException;
-    public String removeMovieSlots (String movieID, String movieName) throws RemoteException, ParseException;
+    public String removeMovieSlots (String movieID, String movieName,  boolean isClientCall) throws RemoteException, ParseException;
     public String[] listMovieShowsAvailability (String movieName, boolean isClientCall) throws RemoteException;
 
     // Customer
     public String bookMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets, boolean isClientCall) throws RemoteException;
     public String[] getBookingSchedule (String customerID, boolean isClientCall) throws RemoteException;
     public String cancelMovieTickets (String customerID, String movieID, String movieName, int numberOfTickets, boolean isClient) throws IOException;
-	public String exchangeTickets(String customerID, String curr_movieID, String new_movieID, String new_movieName, int numberOfTickets);
+	// public String exchangeTickets(String customerID, String curr_movieID, String new_movieID, String new_movieName, int numberOfTickets);
+    String exchangeTickets (String customerID, String movieID, String old_movieName, String new_movieID, String new_movieName, int numberOfTickets);
 
 
 
