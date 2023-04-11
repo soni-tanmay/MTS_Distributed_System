@@ -1,0 +1,16 @@
+Apr 10, 2023 10:43:43 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 10, 2023 10:43:43 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 10, 2023 11:15:02 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 10, 2023 11:15:03 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 10, 2023 11:23:21 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 10, 2023 11:23:22 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 10, 2023 11:29:16 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 10, 2023 11:29:16 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007

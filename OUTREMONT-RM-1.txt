@@ -1,0 +1,52 @@
+Apr 10, 2023 10:41:00 PM Replica1.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 10, 2023 10:41:01 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 10:41:01 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 10:41:01 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4201
+Apr 10, 2023 10:41:01 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4205
+Apr 10, 2023 11:15:02 PM Replica1.ThreadCall run
+INFO: Received datagram packet
+Apr 10, 2023 11:15:02 PM Replica1.CustomerImpl getMyData
+INFO: UDP call received
+Apr 10, 2023 11:15:02 PM Replica1.CustomerImpl listMovieShowsAvailability
+INFO: Called function listMovieShowsAvailability with params:  AVATAR
+Apr 10, 2023 11:15:02 PM Replica1.CustomerImpl listMovieShowsAvailability
+INFO: Function call completed. Returning: OUTA140423 6_OUTE130423 10_OUTE150423 8_OUTM130423 4
+Apr 10, 2023 11:15:02 PM Replica1.ThreadCall run
+INFO: Datagram packet response sent.
+Apr 10, 2023 11:15:02 PM Replica1.ThreadCall run
+INFO: Datagram Socket closed.
+Apr 10, 2023 11:15:02 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 11:15:02 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4201
+Apr 10, 2023 11:23:00 PM Replica1.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 10, 2023 11:23:01 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 11:23:01 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 11:23:01 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4201
+Apr 10, 2023 11:23:01 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4205
+Apr 10, 2023 11:29:16 PM Replica1.ThreadCall run
+INFO: Received datagram packet
+Apr 10, 2023 11:29:16 PM Replica1.CustomerImpl getMyData
+INFO: UDP call received
+Apr 10, 2023 11:29:16 PM Replica1.CustomerImpl listMovieShowsAvailability
+INFO: Called function listMovieShowsAvailability with params:  AVATAR
+Apr 10, 2023 11:29:16 PM Replica1.CustomerImpl listMovieShowsAvailability
+INFO: Function call completed. Returning: OUTA140423 6_OUTE130423 10_OUTE150423 8_OUTM130423 4
+Apr 10, 2023 11:29:16 PM Replica1.ThreadCall run
+INFO: Datagram packet response sent.
+Apr 10, 2023 11:29:16 PM Replica1.ThreadCall run
+INFO: Datagram Socket closed.
+Apr 10, 2023 11:29:16 PM Replica1.ThreadCall run
+INFO: Thread started from server: Replica1.CustomerImpl@300b2ac1
+Apr 10, 2023 11:29:16 PM Replica1.ThreadCall run
+INFO: Datagram socket opened on port: 4201

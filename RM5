@@ -1,0 +1,8 @@
+Apr 10, 2023 11:08:34 PM Replica5.ReplicaManager5 getRequestFromFE
+INFO: Thread started from RM5 to detect crash
+Apr 10, 2023 11:08:34 PM Replica5.ReplicaManager5 getRequestFromFE
+WARNING: Exception occurred: java.net.BindException: Address already in use: Cannot bind
+Apr 10, 2023 11:15:02 PM Replica5.ReplicaManager5 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 10, 2023 11:15:02 PM Replica5.ReplicaManager5 getRequestFromSequencer
+WARNING: Exception occurred: javax.xml.ws.WebServiceException: Undefined port type: {http://Replica5/}ICustomer

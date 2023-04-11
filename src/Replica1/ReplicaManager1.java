@@ -90,7 +90,7 @@ public class ReplicaManager1 {
         ).start();
     }
 
-    public static void getRequestFromFE(){
+    public static void getRequestFromFE(){ //detecting crash
         DatagramSocket ds = null;
         try {
             while(true){
@@ -147,7 +147,9 @@ public class ReplicaManager1 {
 
     public static void runPreviousRequests() throws MalformedURLException {
         for(String request: totalOrderList){
-            processRequest(request);
+            String res = processRequest(request);
+            System.out.println("Response for " + request + ":" + res);
+            seqCounter = Integer.parseInt(request.substring(0,1));
         }
     }
 
@@ -163,15 +165,22 @@ public class ReplicaManager1 {
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
             while(true){
-                System.out.println("Thread started from RM1");
-                byte[] req = new byte[1024];
-                DatagramPacket dp = new DatagramPacket(req, req.length);
-                ms.receive(dp);
-                rmLogger.logger.info("Received datagram packet");
-                String reqMsg = (new String(dp.getData())).trim();
-                System.out.println("in thread reqMsg: " + reqMsg);
-                String response = processRequest(reqMsg);
-                sendResponseToFE(response);
+                try{
+                    System.out.println("Thread started from RM1");
+                    byte[] req = new byte[1024];
+                    DatagramPacket dp = new DatagramPacket(req, req.length);
+                    ms.receive(dp);
+                    rmLogger.logger.info("Received datagram packet");
+                    String reqMsg = (new String(dp.getData())).trim();
+                    System.out.println("in thread reqMsg: " + reqMsg);
+                    String response = processRequest(reqMsg);
+                    sendResponseToFE(response);
+                }
+                catch(Exception ex){
+                    System.out.println("Exception occurred");
+                    ex.printStackTrace();
+                }
+
 //                rmLogger.logger.info("Datagram packet response sent.");
 //                ms.close();
 //                rmLogger.logger.info("Multicast Socket closed.");

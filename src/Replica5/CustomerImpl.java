@@ -1,4 +1,4 @@
-package Replica4;
+package Replica5;
 
 import Utils.Log;
 import Utils.Models.Response;
@@ -52,19 +52,19 @@ class sortAvailableShowListComparator implements Comparator {
     }
 }
 
-@WebService(endpointInterface = "Replica4.ICustomer")
+@WebService(endpointInterface = "Replica5.ICustomer")
 public class CustomerImpl implements ICustomer {
 
     public ConcurrentHashMap<String, ConcurrentHashMap<String, MovieData>> movies = new ConcurrentHashMap<String, ConcurrentHashMap<String, MovieData>>();
     public ConcurrentHashMap<String, ArrayList<CustomerData>> customerBookings = new ConcurrentHashMap<String, ArrayList<CustomerData>>();
     public String serverName;
     Log logger;
-    int atwVerPortNum = 4200;
-    int atwOutPortNum = 4201;
-    int verAtwPortNum = 4204;
-    int verOutPortNum = 4205;
-    int outVerPortNum = 4208;
-    int outAtwPortNum = 4209;
+    int atwVerPortNum = 5200;
+    int atwOutPortNum = 5201;
+    int verAtwPortNum = 5204;
+    int verOutPortNum = 5205;
+    int outVerPortNum = 5208;
+    int outAtwPortNum = 5209;
 
     public CustomerImpl(String server, Log logger) throws Exception {
         super();

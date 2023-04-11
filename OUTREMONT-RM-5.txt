@@ -1,0 +1,10 @@
+Apr 10, 2023 11:08:07 PM Replica5.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 10, 2023 11:08:08 PM Replica5.ThreadCall run
+INFO: Thread started from server: Replica5.CustomerImpl@43978dcf
+Apr 10, 2023 11:08:08 PM Replica5.ThreadCall run
+INFO: Thread started from server: Replica5.CustomerImpl@43978dcf
+Apr 10, 2023 11:08:08 PM Replica5.ThreadCall run
+INFO: Datagram socket opened on port: 5201
+Apr 10, 2023 11:08:08 PM Replica5.ThreadCall run
+INFO: Datagram socket opened on port: 5205
