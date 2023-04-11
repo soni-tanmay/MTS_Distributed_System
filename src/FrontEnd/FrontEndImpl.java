@@ -204,33 +204,41 @@ public class FrontEndImpl implements  IFrontEnd{
                 if (matchResponse(rm1,rm2)){
                     if(matchResponse(rm2,rm3)){
                         // software failure in rm4
+                        sendFailureMsg(Constants.RM4_IP,Constants.RM1Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm2,rm4)){
                         // software failure in rm3
+                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }
                 }else if(matchResponse(rm2,rm3)){
                     if (matchResponse(rm3,rm1)){
                         // software failure in rm4
+                        sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm3,rm4)){
                         // software failure in rm1
+                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm3.split("_")) ));
                     }
                 }else if(matchResponse(rm3,rm4)){
                     if (matchResponse(rm4,rm1)){
                         // software failure in rm2
+                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm4,rm2)){
                         // software failure in rm1
+                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm3.split("_")) ));
                     }
                 }else if (matchResponse(rm4,rm1)){
                     if (matchResponse(rm1,rm2)){
                         // software failure in rm3
+                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm1,rm3)){
                         // software failure in rm2
+                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }
                 }
@@ -238,15 +246,19 @@ public class FrontEndImpl implements  IFrontEnd{
         } else if (responses.size()==3) {
             if (rm1.equals("")){
                 // crash failure in rm1
+                sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"CrashFailure");
                 return new Response(200, new ArrayList<>(Arrays.asList(rm3.split("_")) ));
             } else if (rm2.equals("")) {
                 // crash failure in rm2
+                sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"CrashFailure");
                 return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
             }else if (rm3.equals("")) {
                 // crash failure in rm3
+                sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"CrashFailure");
                 return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
             }else if (rm4.equals("")) {
                 // crash failure in rm4
+                sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"CrashFailure");
                 return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
             }
         }

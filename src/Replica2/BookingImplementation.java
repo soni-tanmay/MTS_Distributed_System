@@ -48,7 +48,7 @@ class Booking {
 
  }
 
-@WebService(endpointInterface="assignmentws.BookingInterface")
+@WebService(endpointInterface="Replica2.BookingInterface")
 // @SOAPBinding(style=Style.RPC)
 public class BookingImplementation implements BookingInterface{
 

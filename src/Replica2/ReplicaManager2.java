@@ -53,6 +53,7 @@ public class ReplicaManager2 {
 
     public static String convertArrayToString(ArrayList<String> responseArray) {
         // seqCounter-RM2-Item1 20_Item2 30
+        System.out.println("response array - " + responseArray);
         String response = String.join("_", responseArray);
         return response;
     }
@@ -92,9 +93,9 @@ public class ReplicaManager2 {
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
-//            NetworkInterface networkInterface = NetworkInterface.getByName("eth0");
-//            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
-//            ms.setNetworkInterface(networkInterface);
+           NetworkInterface networkInterface = NetworkInterface.getByName("en0");
+           Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
+           ms.setNetworkInterface(networkInterface);
 
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
@@ -149,7 +150,7 @@ public class ReplicaManager2 {
         String portNum = getPortNum(server);
 
         url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
-        qName = new QName("http://Replica1/", "CustomerImplService");
+        qName = new QName("http://Replica2/", "BookingImplementationService");
         Service service = Service.create(url,qName);
         clientObj = service.getPort(BookingInterface.class);
 

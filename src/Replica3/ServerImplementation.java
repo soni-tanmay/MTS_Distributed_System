@@ -14,7 +14,7 @@ import java.util.Collections;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
-@WebService(endpointInterface="MTS.ServerInterface")
+@WebService(endpointInterface="Replica3.ServerInterface")
 //@SOAPBinding(style= Style.RPC)
 public class ServerImplementation implements ServerInterface{
 
@@ -41,7 +41,8 @@ public class ServerImplementation implements ServerInterface{
             if (!movieID.contains(serverName) || (movieID.charAt(3)!='M' && movieID.charAt(3)!='A' && movieID.charAt(3)!='E')){
                 System.out.println("addMovieSlots: Unauthorised movie id");
                 myLogger.logger.info(LocalDateTime.now() + " | addMovieSlots | " + movieID + "_" + movieName + "_" + bookingCapacity + " | completed | " + "Unauthorised movie id");
-                return "Unauthorised movie id";
+//                return "Unauthorised movie id";
+                return "Failure";
             }
 
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
@@ -51,7 +52,8 @@ public class ServerImplementation implements ServerInterface{
             if(!movieDate.isAfter(todayDate) || movieDate.isAfter(weekEndDate)){
                 System.out.println("addMovieSlots: Invalid movie date");
                 myLogger.logger.info(LocalDateTime.now() + " | addMovieSlots | " + movieID + "_" + movieName + "_" + bookingCapacity + " | completed | " + "Invalid movie date");
-                return "Invalid movie date";
+//                return "Invalid movie date";
+                return "Failure";
             }
             if(serverDataList.get(movieName)==null){
                 serverDataList.put(movieName, new ConcurrentHashMap<String, ServerData>() {
@@ -66,11 +68,13 @@ public class ServerImplementation implements ServerInterface{
             }
             System.out.println("addMovieSlots: Successfully added");
             myLogger.logger.info(LocalDateTime.now() + " | addMovieSlots | " + movieID + "_" + movieName + "_" + bookingCapacity + " | completed | " + "Successfully added");
-            return "Successfully added";
+//            return "Successfully added";
+            return "Success";
         }catch (Exception e){
             System.out.println("addMovieSlots: "+ e);
             myLogger.logger.info(LocalDateTime.now() + " | addMovieSlots | " + movieID + "_" + movieName + "_" + bookingCapacity + " | completed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -83,7 +87,8 @@ public class ServerImplementation implements ServerInterface{
             if(!movieID.contains(serverName) || serverDataList.get(movieName)==null || serverDataList.get(movieName).isEmpty() || serverDataList.get(movieName).get(movieID)== null|| !movieDate.isAfter(todayDate)){
                 System.out.println("removeMovieSlots: Unauthorised request");
                 myLogger.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | completed | " + "Unauthorised request");
-                return "Unauthorised request";
+//                return "Unauthorised request";
+                return "Failure";
             }
 
             if(serverDataList.get(movieName).get(movieID).clientIDList == null || serverDataList.get(movieName).get(movieID).clientIDList.isEmpty() || serverDataList.get(movieName).get(movieID).clientIDList.size()==0){
@@ -118,11 +123,13 @@ public class ServerImplementation implements ServerInterface{
             }
             System.out.println("removeMovieSlots: Removed slot successfully");
             myLogger.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | completed | " + "Removed slot successfully");
-            return "Removed slot successfully";
+//            return "Removed slot successfully";
+            return "Success";
         }catch (Exception e){
             System.out.println("removeMovieSlots: "+e);
             myLogger.logger.info(LocalDateTime.now() + " | removeMovieSlots | " + movieID + "_" + movieName + " | failed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -156,13 +163,13 @@ public class ServerImplementation implements ServerInterface{
                 String str2 = new String(datagramPacket22.getData());
 
                 if(!str1.trim().isEmpty())
-                    for (String s : str1.trim().split("\n")){
+                    for (String s : str1.trim().split("_")){
                         if (!s.trim().isEmpty())
                             movieAvailabilityList.add(s.trim());
                     }
 
                 if(!str2.trim().isEmpty())
-                    for (String s : str2.trim().split("\n")){
+                    for (String s : str2.trim().split("_")){
                         if (!s.trim().isEmpty())
                             movieAvailabilityList.add(s.trim());
                     }
@@ -174,12 +181,13 @@ public class ServerImplementation implements ServerInterface{
             System.out.println("listMovieShowsAvailability: "+ movieAvailabilityList);
             myLogger.logger.info(LocalDateTime.now() + " | listMovieShowsAvailability | " + movieName + " | completed | " + movieAvailabilityList);
 
-            return String.join("\n",movieAvailabilityList);
+            return String.join("_",movieAvailabilityList);
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("listMovieShowsAvailability "+e);
             myLogger.logger.info(LocalDateTime.now() + " | listMovieShowsAvailability | " + movieName + " | failed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -189,7 +197,7 @@ public class ServerImplementation implements ServerInterface{
             ArrayList<String> bookingSchedule = new ArrayList<>();
 
             if (!getBookingSchedule(customerID,true).trim().isEmpty())
-                for (String s : getBookingSchedule(customerID,true).split("\n")){
+                for (String s : getBookingSchedule(customerID,true).split("_")){
                     if (!s.trim().isEmpty())
                         bookingSchedule.add(s.trim());
                 }
@@ -199,7 +207,8 @@ public class ServerImplementation implements ServerInterface{
                 if(serverDataList.get(movieName)==null || serverDataList.get(movieName).isEmpty() || serverDataList.get(movieName).get(movieID)==null){
                     System.out.println("bookMovieTickets: Movie does not exist");
                     myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Movie does not exist");
-                    return "Movie does not exist";
+//                    return "Movie does not exist";
+                    return "Failure";
                 }
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
@@ -209,13 +218,15 @@ public class ServerImplementation implements ServerInterface{
                 if (!movieDate.isAfter(todayDate)){
                     System.out.println("bookMovieTickets: Cannot book past movie slots");
                     myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Cannot book past movie slots");
-                    return "Cannot book past movie slots";
+//                    return "Cannot book past movie slots";
+                    return "Failure";
                 }
 
                 if(serverDataList.get(movieName).get(movieID).capacity < numberOfTickets){
                     System.out.println("bookMovieTickets: Not enough tickets available");
                     myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Not enough tickets available");
-                    return "Not enough tickets available";
+//                    return "Not enough tickets available";
+                    return "Failure";
                 }
 
                 for (String e : bookingSchedule){
@@ -223,7 +234,8 @@ public class ServerImplementation implements ServerInterface{
                     if(movieName.equals(data[1].trim()) && movieID.substring(3).equals(data[0].trim().substring(3))){
                         System.out.println("bookMovieTickets: Already booked for the same slot");
                         myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Already booked for the same slot");
-                        return "Already booked for the same slot";
+//                        return "Already booked for the same slot";
+                        return "Failure";
                     }
                 }
                 serverDataList.get(movieName).get(movieID).capacity -= numberOfTickets;
@@ -238,20 +250,23 @@ public class ServerImplementation implements ServerInterface{
                     clientDataList.get(customerID.trim()).add(new ClientData(movieName,movieID,numberOfTickets));
                     System.out.println("bookMovieTickets: Successfully booked");
                     myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Successfully booked");
-                    return "Successfully booked";
+//                    return "Successfully booked";
+                    return "Success";
                 }
                 for (ClientData e : clientDataList.get(customerID.trim())){
                     if(e.movieID.equals(movieID) && e.movieName.equals(movieName)){
                         e.tickets += numberOfTickets;
                         System.out.println("bookMovieTickets: Successfully booked");
                         myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Successfully booked");
-                        return "Successfully booked";
+//                        return "Successfully booked";
+                        return "Success";
                     }
                 }
                 clientDataList.get(customerID.trim()).add(new ClientData(movieName,movieID,numberOfTickets));
                 System.out.println("bookMovieTickets: Successfully booked");
                 myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Successfully booked");
-                return "Successfully booked";
+//                return "Successfully booked";
+                return "Success";
             }else {
                 int count =0;
 
@@ -269,7 +284,8 @@ public class ServerImplementation implements ServerInterface{
                 if ((numberOfTickets+count)>3){
                     System.out.println("bookMovieTickets: Cannot book more than 3 tickets");
                     myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Cannot book more than 3 tickets");
-                    return "Cannot book more than 3 tickets";
+//                    return "Cannot book more than 3 tickets";
+                    return "Failure";
                 }
 
                 DatagramSocket datagramSocket1 = new DatagramSocket();
@@ -292,7 +308,8 @@ public class ServerImplementation implements ServerInterface{
         }catch (Exception e){
             System.out.println("bookMovieTickets: "+ e);
             myLogger.logger.info(LocalDateTime.now() + " | bookMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | failed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -327,13 +344,13 @@ public class ServerImplementation implements ServerInterface{
                 String str2 = new String(datagramPacket22.getData());
 
                 if(!str1.trim().isEmpty())
-                    for (String s : str1.trim().split("\n")){
+                    for (String s : str1.trim().split("_")){
                         if(!s.trim().isEmpty())
                             bookingSchedule.add(s.trim());
                     }
 
                 if(!str2.trim().isEmpty())
-                    for (String s : str2.trim().split("\n")){
+                    for (String s : str2.trim().split("_")){
                         if(!s.trim().isEmpty())
                             bookingSchedule.add(s.trim());
                     }
@@ -345,11 +362,12 @@ public class ServerImplementation implements ServerInterface{
             System.out.println("getBookingSchedule: "+ bookingSchedule);
             myLogger.logger.info(LocalDateTime.now() + " | getBookingSchedule | " + customerID + " | completed | " + bookingSchedule);
 
-            return String.join("\n",bookingSchedule);
+            return String.join("_",bookingSchedule);
         }catch (Exception e){
             System.out.println("getBookingSchedule: "+ e);
             myLogger.logger.info(LocalDateTime.now() + " | getBookingSchedule | " + customerID + " | failed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -366,24 +384,28 @@ public class ServerImplementation implements ServerInterface{
                                 serverDataList.get(e.movieName).get(e.movieID).clientIDList.remove(customerID);
                                 System.out.println("cancelMovieTickets: Cancelled");
                                 myLogger.logger.info(LocalDateTime.now() + " | cancelMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Cancelled");
-                                return "Cancelled";
+//                                return "Cancelled";
+                                return "Success";
                             }else if(numberOfTickets<e.tickets){
                                 serverDataList.get(e.movieName).get(e.movieID).capacity +=numberOfTickets;
                                 e.tickets -= numberOfTickets;
                                 System.out.println("cancelMovieTickets: Cancelled");
                                 myLogger.logger.info(LocalDateTime.now() + " | cancelMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Cancelled");
-                                return "Cancelled";
+//                                return "Cancelled";
+                                return "Success";
                             }else {
                                 System.out.println("cancelMovieTickets: Invalid number of tickets");
                                 myLogger.logger.info(LocalDateTime.now() + " | cancelMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "Invalid number of tickets");
-                                return "Invalid number of tickets";
+//                                return "Invalid number of tickets";
+                                return "Failure";
                             }
                         }
                     }
                 }
                 System.out.println("cancelMovieTickets: no tickets found");
                 myLogger.logger.info(LocalDateTime.now() + " | cancelMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | completed | " + "no tickets found");
-                return "no tickets found";
+//                return "no tickets found";
+                return "Failure";
             }else {
                 DatagramSocket datagramSocket1 = new DatagramSocket();
                 byte[] b = ("cancelMovieTickets_"+customerID+"_"+movieID+"_"+movieName+"_"+numberOfTickets).getBytes();
@@ -405,7 +427,8 @@ public class ServerImplementation implements ServerInterface{
         }catch (Exception e){
             System.out.println("cancelMovieTickets: "+ e);
             myLogger.logger.info(LocalDateTime.now() + " | cancelMovieTickets | " + customerID + "_" + movieID + "_" + movieName + "_" + numberOfTickets + " | failed | " + e);
-            return null;
+//            return null;
+            return "Failure";
         }
     }
 
@@ -420,11 +443,13 @@ public class ServerImplementation implements ServerInterface{
                 if (cancelTickets.equals("Cancelled") && bookTickets.equals("Successfully booked")){
                     System.out.println("exchangeTickets: "+ "Exchange Successful");
                     myLogger.logger.info(LocalDateTime.now() + " | exchangeTickets | " + customerID + "_" + movieID + "_" + new_movieID + "_" + old_movieName + "_" + new_movieName + "_" + numberOfTickets + " | completed | " + "Exchange Successful");
-                    return "Exchange Successful";
+//                    return "Exchange Successful";
+                    return "Success";
                 }else {
                     System.out.println("exchangeTickets: "+ "Unexpected error");
                     myLogger.logger.info(LocalDateTime.now() + " | exchangeTickets | " + customerID + "_" + movieID + "_" + new_movieID + "_" + old_movieName + "_" + new_movieName + "_" + numberOfTickets + " | completed | " + "Unexpected error");
-                    return "Unexpected error";
+//                    return "Unexpected error";
+                    return "Failure";
                 }
             }else {
                 if (!cancelable.equals("true")) {
@@ -440,7 +465,8 @@ public class ServerImplementation implements ServerInterface{
         }catch (Exception e){
             System.out.println("exchangeTickets: "+ e);
             myLogger.logger.info(LocalDateTime.now() + " | exchangeTickets | " + customerID + "_" + movieID + "_" + new_movieID + "_" + old_movieName + "_" + new_movieName + "_" + numberOfTickets + " | failed | " + e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -452,7 +478,8 @@ public class ServerImplementation implements ServerInterface{
                         if (e.movieID.equals(movieID) && e.movieName.equals(old_movieName)) {
                             if (numberOfTickets > e.tickets) {
                                 System.out.println("isCancelable: Invalid number of tickets");
-                                return "Invalid number of tickets";
+//                                return "Invalid number of tickets";
+                                return "Failure";
                             } else {
                                 System.out.println("isCancelable: true");
                                 return "true";
@@ -461,7 +488,8 @@ public class ServerImplementation implements ServerInterface{
                     }
                 }
                 System.out.println("isCancelable: no tickets found");
-                return "no tickets found";
+//                return "no tickets found";
+                return "Failure";
             } else {
                 DatagramSocket datagramSocket1 = new DatagramSocket();
                 byte[] b = ("isCancelable_" + customerID + "_" + movieID + "_" + old_movieName + "_" + numberOfTickets).getBytes();
@@ -481,7 +509,8 @@ public class ServerImplementation implements ServerInterface{
             }
         }catch (Exception e){
             System.out.println("isCancelable: "+ e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
@@ -490,7 +519,7 @@ public class ServerImplementation implements ServerInterface{
             ArrayList<String> bookingSchedule = new ArrayList<>();
 
             if (!getBookingSchedule(customerID,true).trim().isEmpty())
-                for (String s : getBookingSchedule(customerID,true).split("\n")){
+                for (String s : getBookingSchedule(customerID,true).split("_")){
                     if (!s.trim().isEmpty())
                         bookingSchedule.add(s.trim());
                 }
@@ -498,7 +527,8 @@ public class ServerImplementation implements ServerInterface{
             if(new_movieID.startsWith(serverName)){
                 if(serverDataList.get(new_movieName)==null || serverDataList.get(new_movieName).isEmpty() || serverDataList.get(new_movieName).get(new_movieID)==null){
                     System.out.println("bookingAvailable: Movie does not exist");
-                    return "Movie does not exist";
+//                    return "Movie does not exist";
+                    return "Failure";
                 }
 
                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern("ddMMyy");
@@ -507,12 +537,14 @@ public class ServerImplementation implements ServerInterface{
 
                 if (!movieDate.isAfter(todayDate)){
                     System.out.println("bookingAvailable: Cannot book past movie slots");
-                    return "Cannot book past movie slots";
+//                    return "Cannot book past movie slots";
+                    return "Failure";
                 }
 
                 if(serverDataList.get(new_movieName).get(new_movieID).capacity < numberOfTickets){
                     System.out.println("bookingAvailable: Not enough tickets available");
-                    return "Not enough tickets available";
+//                    return "Not enough tickets available";
+                    return "Failure";
                 }
 
                 for (String e : bookingSchedule){
@@ -520,7 +552,8 @@ public class ServerImplementation implements ServerInterface{
                     if(!data[0].trim().equals(movieID)) {
                         if (new_movieName.equals(data[1].trim()) && new_movieID.substring(3).equals(data[0].trim().substring(3))) {
                             System.out.println("bookingAvailable: Already booked for the same slot");
-                            return "Already booked for the same slot";
+//                            return "Already booked for the same slot";
+                            return "Failure";
                         }
                     }
                 }
@@ -545,7 +578,8 @@ public class ServerImplementation implements ServerInterface{
 
                 if ((numberOfTickets+count)>3){
                     System.out.println("bookingAvailable: Cannot book more than 3 tickets");
-                    return "Cannot book more than 3 tickets";
+//                    return "Cannot book more than 3 tickets";
+                    return "Failure";
                 }
 
                 DatagramSocket datagramSocket1 = new DatagramSocket();
@@ -566,7 +600,8 @@ public class ServerImplementation implements ServerInterface{
             }
         }catch (Exception e){
             System.out.println("bookingAvailable: "+ e);
-            return e.toString();
+//            return e.toString();
+            return "Failure";
         }
     }
 
