@@ -12,12 +12,13 @@ import javax.xml.ws.Service;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
+import java.util.Enumeration;
 
 public class ReplicaManager3 {
     static Log rmLogger;
     static int seqCounter;
     private static Service serviceAPI;
-    static ICustomer clientObj;
+    static ServerInterface clientObj;
     //    private static String reqMsg;
     public ReplicaManager3() throws IOException {
         rmLogger = new Log("RM3");
@@ -27,21 +28,21 @@ public class ReplicaManager3 {
     private static String identifyClientServer(String userid){
         String server = userid.substring(0,3).toUpperCase();
         if(server.equals("ATW")){
-            return "ATWATER";
+            return "atw";
         }
         else if(server.equals("OUT")){
-            return "OUTREMONT";
+            return "out";
         }
         else {
-            return "VERDUN";
+            return "ver";
         }
     }
     private static String getPortNum(String server){
         String portNum = "";
-        if(server.equals("ATWATER")){
+        if(server.equals("atw")){
             portNum = "8081";
         }
-        else if(server.equals("OUTREMONT")){
+        else if(server.equals("out")){
             portNum = "8083";
         }
         else{
@@ -154,13 +155,13 @@ public class ReplicaManager3 {
     }
 
     public static void getRequestFromSequencer(){
-        MulticastSocket ms = null;
+        MulticastSocket ms;
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
-//            NetworkInterface networkInterface = NetworkInterface.getByName("eth0");
-//            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
-//            ms.setNetworkInterface(networkInterface);
+            NetworkInterface networkInterface = NetworkInterface.getByName("en0");
+            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
+            ms.setNetworkInterface(networkInterface);
 
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
@@ -215,9 +216,9 @@ public class ReplicaManager3 {
         String portNum = getPortNum(server);
 
         url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
-        qName = new QName("http://Replica1/", "CustomerImplService");
+        qName = new QName("http://Replica3/", "ServerImplementationService");
         Service service = Service.create(url,qName);
-        clientObj = service.getPort(ICustomer.class);
+        clientObj = service.getPort(ServerInterface.class);
 
         String response;
         switch (params[1].trim()){
@@ -231,7 +232,7 @@ public class ReplicaManager3 {
             case "removeMovieSlots":
                 totalOrderList.add(reqMsg);
                 //2_removeMovieSlots_customerID_movieID_movieName
-                response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim());
+                response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim(),true);
                 System.out.println("Response: " + response);
                 return response;
 
