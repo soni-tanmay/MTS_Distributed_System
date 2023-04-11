@@ -15,7 +15,7 @@ import Utils.Log;
 
 public class VerdunServer {
 	public static void main(String[] args) throws SecurityException, IOException {
-        Log verdunLogger = new Log("VERDUN.txt");
+        Log verdunLogger = new Log("VERDUN-RM-2.txt");
         verdunLogger.logger.setLevel(Level.ALL);
         verdunLogger.logger.setUseParentHandlers(false);
         verdunLogger.logger.info("VERDUN Server started.");

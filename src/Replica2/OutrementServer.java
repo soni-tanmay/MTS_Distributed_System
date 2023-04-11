@@ -16,7 +16,7 @@ import Utils.Log;
 public class OutrementServer {
 	public static void main(String[] args) throws SecurityException, IOException {
 
-        Log outrementLogger = new Log("OUTREMENT.txt");
+        Log outrementLogger = new Log("OUTREMENT-RM-2.txt");
         outrementLogger.logger.setLevel(Level.ALL);
         outrementLogger.logger.setUseParentHandlers(false);
         outrementLogger.logger.info("OUTREMENT Server started.");
