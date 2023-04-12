@@ -185,6 +185,7 @@ public class FrontEndImpl implements  IFrontEnd{
 
     public void responseRM (String response){
         responses.add(response);
+        System.out.println("responseRM time: "+latch.getCount());
     }
 
     void checkRMsFailure(String rm){
