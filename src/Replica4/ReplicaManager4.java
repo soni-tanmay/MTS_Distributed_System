@@ -114,7 +114,9 @@ public class ReplicaManager4 {
                 }
                 else if(reqMsg.equals("SoftwareFailure")){
                     switchReplica();
+                    ds.close();
                 }
+                ds.close();
 
                 /*
                 * InetAddress ina = InetAddress.getLocalHost();
@@ -129,7 +131,8 @@ public class ReplicaManager4 {
             }
         }
         catch(Exception ex) {
-            System.out.println("Exception occurred!!!");
+            System.out.println("Exception occurred!!!123");
+            ex.printStackTrace();
             rmLogger.logger.warning("Exception occurred: " + ex);
             System.out.println(ex);
         }
@@ -140,16 +143,28 @@ public class ReplicaManager4 {
     }
 
     public static void restartReplica() throws Exception {
-        String []args = {"",""};
-        AtwaterServer.main(args);
-        OutremontServer.main(args);
-        VerdunServer.main(args);
-        runPreviousRequests();
+        try{
+            System.out.println("Restarting replica due to fault");
+            String []args = {"",""};
+
+            AtwaterServer.main(args);
+            OutremontServer.main(args);
+            VerdunServer.main(args);
+
+            Thread.sleep(5000);
+            runPreviousRequests();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
     }
 
     public static void runPreviousRequests() throws MalformedURLException {
         for(String request: totalOrderList){
-            processRequest(request);
+            String res = processRequest(request);
+            System.out.println("Response for " + request + ":" + res);
+            seqCounter = Integer.parseInt(request.substring(0,1));
         }
     }
 
@@ -200,80 +215,96 @@ public class ReplicaManager4 {
             return seqCounter + "-RM4-Failure";
         }
         String[] request = reqMsg.split("_");
-        seqCounter = Integer.parseInt(request[0].trim());
+        //seqCounter
+        int seqID = Integer.parseInt(request[0].trim());
+//        if(seqID - seqCounter != 1){
+//            ////ToDo ask other RM's if incorrect
+//        }
+//        else{
+            System.out.println("Split Request: ");
+            for(String s: request){
+                System.out.println(s);
+            }
+            String replicaResponse = sendRequestToReplica(reqMsg);
+            return seqID + "-RM4-" + replicaResponse;
+//        }
         //ToDo verify if correct
-        System.out.println("Split Request: ");
-        for(String s: request){
-            System.out.println(s);
-        }
-        String replicaResponse = sendRequestToReplica(reqMsg); //ToDo send request to implementation
-        return seqCounter + "-RM4-" + replicaResponse;
+        //ToDo ask other RM's if incorrect
+
+//        return seqID + "-RM4-Failure";
     }
 
     public static String sendRequestToReplica(String reqMsg) throws MalformedURLException {
-        System.out.println("Entered sendRequestToReplica");
-        URL url;
-        QName qName;
-        String[] params = reqMsg.split("_");
-        String server = identifyClientServer(params[2].trim().toString());
-        String portNum = getPortNum(server);
+//        try{
+            System.out.println("Entered sendRequestToReplica");
+            URL url;
+            QName qName;
+            String[] params = reqMsg.split("_");
+            String server = identifyClientServer(params[2].trim().toString());
+            String portNum = getPortNum(server);
 
-        url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
-        qName = new QName("http://Replica4/", "CustomerImplService");
-        Service service = Service.create(url,qName);
-        clientObj = service.getPort(ICustomer.class);
+            url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
+            qName = new QName("http://Replica4/", "CustomerImplService");
+            Service service = Service.create(url,qName);
+            clientObj = service.getPort(ICustomer.class);
 
-        String response;
-        switch (params[1].trim()){
-            case "addMovieSlots":
-                totalOrderList.add(reqMsg);
-                //1_addMovieSlots_customerID_movieID_movieName_bookingCapacity
-                response = clientObj.addMovieSlots(params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
-                System.out.println("Response: " + response);
-                return response;
+            String response;
+            switch (params[1].trim()){
+                case "addMovieSlots":
+                    totalOrderList.add(reqMsg);
+                    //1_addMovieSlots_customerID_movieID_movieName_bookingCapacity
+                    response = clientObj.addMovieSlots(params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "removeMovieSlots":
-                totalOrderList.add(reqMsg);
-                //2_removeMovieSlots_customerID_movieID_movieName
-                response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim());
-                System.out.println("Response: " + response);
-                return response;
+                case "removeMovieSlots":
+                    totalOrderList.add(reqMsg);
+                    //2_removeMovieSlots_customerID_movieID_movieName
+                    response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim());
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "listMovieShowsAvailability":
-                //3_listMovieShowsAvailability_customerID_movieName_isClientCall
-                response = clientObj.listMovieShowsAvailability(params[3].trim(),Boolean.parseBoolean(params[4].trim()));
-                System.out.println("Response: " + response);
-                return response;
+                case "listMovieShowsAvailability":
+                    //3_listMovieShowsAvailability_customerID_movieName_isClientCall
+                    response = clientObj.listMovieShowsAvailability(params[3].trim(),Boolean.parseBoolean(params[4].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "bookMovieTickets":
-                totalOrderList.add(reqMsg);
-                //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
-                response = clientObj.bookMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
-                System.out.println("Response: " + response);
-                return response;
+                case "bookMovieTickets":
+                    totalOrderList.add(reqMsg);
+                    //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
+                    response = clientObj.bookMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "getBookingSchedule":
-                //5_getBookingSchedule_customerID_isClientCall
-                response = clientObj.getBookingSchedule(params[2].trim(),Boolean.parseBoolean(params[3].trim()));
-                System.out.println("Response: " + response);
-                return response;
+                case "getBookingSchedule":
+                    //5_getBookingSchedule_customerID_isClientCall
+                    response = clientObj.getBookingSchedule(params[2].trim(),Boolean.parseBoolean(params[3].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "cancelMovieTickets":
-                totalOrderList.add(reqMsg);
-                //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
-                response = clientObj.cancelMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
-                System.out.println("Response: " + response);
-                return response;
+                case "cancelMovieTickets":
+                    totalOrderList.add(reqMsg);
+                    //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
+                    response = clientObj.cancelMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-            case "exchangeTickets":
-                totalOrderList.add(reqMsg);
-                //7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
-                response = clientObj.exchangeTickets(params[2].trim(),params[3].trim(),params[4].trim(),params[5].trim(),params[6].trim(),Integer.parseInt(params[7].trim()));
-                System.out.println("Response: " + response);
-                return response;
+                case "exchangeTickets":
+                    totalOrderList.add(reqMsg);
+                    //7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
+                    response = clientObj.exchangeTickets(params[2].trim(),params[3].trim(),params[4].trim(),params[5].trim(),params[6].trim(),Integer.parseInt(params[7].trim()));
+                    System.out.println("Response: " + response);
+                    return response;
 
-        }
-        return ""; //not of any use
+            }
+
+//        }
+//        catch(Exception ex){
+//            ex.printStackTrace();
+//        }
+
+        return ""; //Unreachable statement
     }
 
     public static void sendResponseToFE(String response){
