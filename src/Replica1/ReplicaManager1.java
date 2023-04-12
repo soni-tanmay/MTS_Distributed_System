@@ -7,7 +7,6 @@ import javax.xml.ws.Service;
 import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
-import java.util.Enumeration;
 
 
 public class ReplicaManager1 {
@@ -134,6 +133,7 @@ public class ReplicaManager1 {
 
     public static void switchReplica(){
         System.out.println("Switching replica");
+
     }
 
     public static void restartReplica() throws Exception {
@@ -179,11 +179,8 @@ public class ReplicaManager1 {
                 catch(Exception ex){
                     System.out.println("Exception occurred");
                     ex.printStackTrace();
+                    rmLogger.logger.warning("Exception occurred: " + ex);
                 }
-
-//                rmLogger.logger.info("Datagram packet response sent.");
-//                ms.close();
-//                rmLogger.logger.info("Multicast Socket closed.");
             }
         }
         catch(Exception ex) {

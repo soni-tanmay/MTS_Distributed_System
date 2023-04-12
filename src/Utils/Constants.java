@@ -15,11 +15,11 @@ public class Constants {
 
     public static String RM4_IP = "172.20.10.7"; //Amarta
 
-    public static String NetworkIP = "228.5.6.7"; //for all RMs
+    public static String NetworkIP = "224.0.0.4"; //for all RMs
     public static int multicastSocket = 5555;
     public static int RM1Port = 7003;
     public static int RM2Port = 7004;
     public static int RM3Port = 7005;
     public static int RM4Port = 7006;
-    public static int RM5Port = 7003;
+    public static int RM5Port = 7007;
 }

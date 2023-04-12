@@ -1,8 +1,6 @@
 package Replica5;
 
-
-import Utils.Constants;
-import Utils.Log;
+import Utils.*;
 
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
@@ -10,11 +8,12 @@ import java.io.IOException;
 import java.net.*;
 import java.util.ArrayList;
 
+
 public class ReplicaManager5 {
     static Log rmLogger;
     static int seqCounter;
     private static Service serviceAPI;
-    static Replica5.ICustomer clientObj;
+    static ICustomer clientObj;
     //    private static String reqMsg;
     public ReplicaManager5() throws IOException {
         rmLogger = new Log("RM5");
@@ -126,17 +125,20 @@ public class ReplicaManager5 {
             }
         }
         catch(Exception ex) {
-            System.out.println("Exception occurred!!!");
+            System.out.println("Exception occurred!!");
             rmLogger.logger.warning("Exception occurred: " + ex);
             System.out.println(ex);
+            ex.printStackTrace();
         }
     }
 
     public static void switchReplica(){
+        System.out.println("Switching replica");
 
     }
 
     public static void restartReplica() throws Exception {
+        System.out.println("Restarting replica due to fault");
         String []args = {"",""};
         AtwaterServer.main(args);
         OutremontServer.main(args);
@@ -146,7 +148,9 @@ public class ReplicaManager5 {
 
     public static void runPreviousRequests() throws MalformedURLException {
         for(String request: totalOrderList){
-            processRequest(request);
+            String res = processRequest(request);
+            System.out.println("Response for " + request + ":" + res);
+            seqCounter = Integer.parseInt(request.substring(0,1));
         }
     }
 
@@ -155,25 +159,28 @@ public class ReplicaManager5 {
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
-//            NetworkInterface networkInterface = NetworkInterface.getByName("eth0");
-//            Enumeration<NetworkInterface> list = NetworkInterface.getNetworkInterfaces();
-//            ms.setNetworkInterface(networkInterface);
+           // NetworkInterface networkInterface = NetworkInterface.getByName("eth0");
+           // ms.setNetworkInterface(networkInterface);
 
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
             while(true){
-                System.out.println("Thread started from RM5");
-                byte[] req = new byte[1025];
-                DatagramPacket dp = new DatagramPacket(req, req.length);
-                ms.receive(dp);
-                rmLogger.logger.info("Received datagram packet");
-                String reqMsg = (new String(dp.getData())).trim();
-                System.out.println("in thread reqMsg: " + reqMsg);
-                String response = processRequest(reqMsg);
-                sendResponseToFE(response);
-//                rmLogger.logger.info("Datagram packet response sent.");
-//                ms.close();
-//                rmLogger.logger.info("Multicast Socket closed.");
+                try{
+                    System.out.println("Thread started from RM5");
+                    byte[] req = new byte[1025];
+                    DatagramPacket dp = new DatagramPacket(req, req.length);
+                    ms.receive(dp);
+                    rmLogger.logger.info("Received datagram packet");
+                    String reqMsg = (new String(dp.getData())).trim();
+                    System.out.println("in thread reqMsg: " + reqMsg);
+                    String response = processRequest(reqMsg);
+                    sendResponseToFE(response);
+                }
+                catch(Exception ex){
+                    System.out.println("Exception occurred");
+                    ex.printStackTrace();
+                    rmLogger.logger.warning("Exception occurred: " + ex);
+                }
             }
         }
         catch(Exception ex) {
