@@ -1,0 +1,136 @@
+Apr 11, 2023 9:47:31 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 9:47:31 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 10:08:39 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 10:08:39 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 10:09:46 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:09:46 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:18:52 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:18:52 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:22:02 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:22:02 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:23:17 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:23:17 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:24:22 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:24:22 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:26:40 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:26:40 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:29:49 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:29:49 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:35:09 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 10:35:09 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 10:52:09 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 10:52:09 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:04:44 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:04:44 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:05:40 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:05:41 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:07:39 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:07:39 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:09:42 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:09:42 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:11:40 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:11:40 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:12:41 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:12:41 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:12:46 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Received datagram packet
+Apr 11, 2023 11:12:46 PM Replica1.AtwaterServer main
+INFO: ATWATER Server started.
+Apr 11, 2023 11:12:46 PM Replica1.AtwaterServer main
+WARNING: Exception occurred in server: com.sun.xml.internal.ws.server.ServerRtException: Server Runtime Error: java.net.BindException: Address already in use: bind
+Apr 11, 2023 11:12:46 PM Replica1.OutremontServer main
+INFO: OUTREMONT Server started.
+Apr 11, 2023 11:12:46 PM Replica1.OutremontServer main
+WARNING: Exception occurred: com.sun.xml.internal.ws.server.ServerRtException: Server Runtime Error: java.net.BindException: Address already in use: bind
+Apr 11, 2023 11:12:46 PM Replica1.VerdunServer configureRMIConnection
+INFO: VERDUN Server started.
+Apr 11, 2023 11:12:46 PM Replica1.VerdunServer configureRMIConnection
+WARNING: Exception occurred in server: com.sun.xml.internal.ws.server.ServerRtException: Server Runtime Error: java.net.BindException: Address already in use: bind
+Apr 11, 2023 11:12:46 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:12:46 PM Replica1.ReplicaManager1 getRequestFromFE
+WARNING: Exception occurred: java.net.BindException: Address already in use: Cannot bind
+Apr 11, 2023 11:17:53 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:17:53 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:18:02 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:18:02 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:26:52 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:26:52 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:27:07 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:27:07 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 11, 2023 11:27:12 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Received datagram packet
+Apr 11, 2023 11:27:12 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:27:12 PM Replica1.ReplicaManager1 getRequestFromFE
+WARNING: Exception occurred: java.net.BindException: Address already in use: Cannot bind
+Apr 11, 2023 11:31:31 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 11, 2023 11:31:31 PM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 11, 2023 11:34:15 PM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 11, 2023 11:34:15 PM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 12, 2023 1:07:38 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 12, 2023 1:07:38 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 12, 2023 1:19:39 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 12, 2023 1:19:39 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 12, 2023 1:22:22 AM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 12, 2023 1:22:22 AM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007
+Apr 12, 2023 1:28:01 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Thread started from RM1 to detect crash
+Apr 12, 2023 1:28:01 AM Replica1.ReplicaManager1 getRequestFromFE
+INFO: Datagram socket opened on port: 7003
+Apr 12, 2023 1:29:14 AM Replica1.ReplicaManager1 getRequestFromSequencer
+INFO: Received datagram packet
+Apr 12, 2023 1:29:15 AM Replica1.ReplicaManager1 sendResponseToFE
+INFO: Datagram packet sent to port 7007

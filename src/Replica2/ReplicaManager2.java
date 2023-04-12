@@ -6,7 +6,6 @@ import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import java.io.IOException;
 import java.net.*;
-import java.rmi.RemoteException;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -100,15 +99,23 @@ public class ReplicaManager2 {
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
             while(true){
-                System.out.println("Thread started from RM2");
-                byte[] req = new byte[1024];
-                DatagramPacket dp = new DatagramPacket(req, req.length);
-                ms.receive(dp);
-                rmLogger.logger.info("Received datagram packet");
-                String reqMsg = (new String(dp.getData())).trim();
-                System.out.println("in thread reqMsg: " + reqMsg);
-                String response = processRequest(reqMsg);
-                sendResponseToFE(response);
+                try{
+                    System.out.println("Thread started from RM2");
+                    byte[] req = new byte[1024];
+                    DatagramPacket dp = new DatagramPacket(req, req.length);
+                    ms.receive(dp);
+                    rmLogger.logger.info("Received datagram packet");
+                    String reqMsg = (new String(dp.getData())).trim();
+                    System.out.println("in thread reqMsg: " + reqMsg);
+                    String response = processRequest(reqMsg);
+                    sendResponseToFE(response);
+                }
+                catch(Exception ex){
+                    System.out.println("Exception occurred");
+                    ex.printStackTrace();
+                    rmLogger.logger.warning("Exception occurred: " + ex);
+                }
+
 //                rmLogger.logger.info("Datagram packet response sent.");
 //                ms.close();
 //                rmLogger.logger.info("Multicast Socket closed.");
@@ -125,20 +132,25 @@ public class ReplicaManager2 {
         }
     }
 
-    public static String processRequest(String reqMsg) throws ParseException, NumberFormatException, IOException {
+    public static String processRequest(String reqMsg) throws NumberFormatException, IOException, ParseException {
         System.out.println("Entered process Request");
         if(reqMsg.isEmpty()) {
             return seqCounter + "-RM2-Failure";
         }
         String[] request = reqMsg.split("_");
-        seqCounter = Integer.parseInt(request[0].trim());
-        //ToDo verify if correct
-        System.out.println("Split Request: ");
-        for(String s: request){
-            System.out.println(s);
-        }
-        String replicaResponse = sendRequestToReplica(reqMsg); //ToDo send request to implementation
-        return seqCounter + "-RM2-" + replicaResponse;
+        //seqCounter
+        int seqID = Integer.parseInt(request[0].trim());
+//        if(seqID - seqCounter != 1){
+//            ////ToDo ask other RM's if incorrect
+//        }
+//        else{
+            System.out.println("Split Request: ");
+            for(String s: request){
+                System.out.println(s);
+            }
+            String replicaResponse = sendRequestToReplica(reqMsg);
+            return seqID + "-RM2-" + replicaResponse;
+//        }
     }
 
     public static String sendRequestToReplica(String reqMsg) throws ParseException, NumberFormatException, IOException {

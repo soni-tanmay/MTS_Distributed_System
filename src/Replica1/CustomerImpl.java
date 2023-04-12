@@ -543,6 +543,7 @@ public class CustomerImpl implements ICustomer {
         System.out.println("listMovieShowsAvailability returning: " + result);
         logger.logger.info("Function call completed. Returning: " + result);
         return result;
+//        return null;
     }
 
     @Override

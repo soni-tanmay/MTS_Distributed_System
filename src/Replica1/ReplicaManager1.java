@@ -12,7 +12,10 @@ import java.util.ArrayList;
 public class ReplicaManager1 {
     static Log rmLogger;
     static int seqCounter;
-    private static Service serviceAPI;
+    static URL url;
+    static QName qName;
+    static boolean isUrlChanged = false;
+    private static Service service;
     static ICustomer clientObj;
 //    private static String reqMsg;
     public ReplicaManager1() throws IOException {
@@ -125,24 +128,51 @@ public class ReplicaManager1 {
             }
         }
         catch(Exception ex) {
-            System.out.println("Exception occurred!!!");
+            System.out.println("Exception occurred!!!123");
+            ex.printStackTrace();
             rmLogger.logger.warning("Exception occurred: " + ex);
             System.out.println(ex);
         }
     }
 
-    public static void switchReplica(){
-        System.out.println("Switching replica");
+    public static String getNewPortNum(String server){
+        String portNum = "";
+        if(server.equals("ATWATER")){
+            portNum = "8093";
+        }
+        else if(server.equals("OUTREMONT")){
+            portNum = "8091";
+        }
+        else{
+            portNum = "8092";
+        }
+        return portNum;
+    }
 
+    public static void switchReplica() throws MalformedURLException {
+        try{
+            System.out.println("Switching replica");
+            isUrlChanged = true;
+            runPreviousRequests();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void restartReplica() throws Exception {
-        System.out.println("Restarting replica due to fault");
-        String []args = {"",""};
-        AtwaterServer.main(args);
-        OutremontServer.main(args);
-        VerdunServer.main(args);
-        runPreviousRequests();
+        try{
+            System.out.println("Restarting replica due to fault");
+            String []args = {"",""};
+            AtwaterServer.main(args);
+            OutremontServer.main(args);
+            VerdunServer.main(args);
+            runPreviousRequests();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
+
     }
 
     public static void runPreviousRequests() throws MalformedURLException {
@@ -200,28 +230,56 @@ public class ReplicaManager1 {
             return seqCounter + "-RM1-Failure";
         }
         String[] request = reqMsg.split("_");
-        seqCounter = Integer.parseInt(request[0].trim());
+        //seqCounter
+        int seqID = Integer.parseInt(request[0].trim());
+//        if(seqID - seqCounter != 1){
+//            ////ToDo ask other RM's if incorrect
+//        }
+//        else{
+            System.out.println("Split Request: ");
+            for(String s: request){
+                System.out.println(s);
+            }
+            String replicaResponse = sendRequestToReplica(reqMsg);
+            return seqID + "-RM1-" + replicaResponse;
+//        }
         //ToDo verify if correct
-        System.out.println("Split Request: ");
-        for(String s: request){
-            System.out.println(s);
-        }
-        String replicaResponse = sendRequestToReplica(reqMsg); //ToDo send request to implementation
-        return seqCounter + "-RM1-" + replicaResponse;
+        //ToDo ask other RM's if incorrect
+
+//        return seqID + "-RM1-Failure";
+    }
+
+    public static void setUrl(String reqMsg){
+
     }
 
     public static String sendRequestToReplica(String reqMsg) throws MalformedURLException {
         System.out.println("Entered sendRequestToReplica");
-        URL url;
-        QName qName;
+
         String[] params = reqMsg.split("_");
         String server = identifyClientServer(params[2].trim().toString());
         String portNum = getPortNum(server);
 
-        url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
-        qName = new QName("http://Replica1/", "CustomerImplService");
-        Service service = Service.create(url,qName);
-        clientObj = service.getPort(ICustomer.class);
+
+        if(isUrlChanged){
+//            String[] params = reqMsg.split("_");
+//            String server = identifyClientServer(params[2].trim().toString());
+            portNum = getNewPortNum(server);
+            url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
+
+            qName = new QName("http://Replica5/", "CustomerImplService"); // if refer to new server add this
+            service = Service.create(url,qName);
+            qName = new QName("http://Replica5/", "CustomerImplPort"); // if refer to new server add this
+            clientObj = service.getPort(qName,ICustomer.class); //if refer to new server add this
+
+        }
+        else{
+            url = new URL("http://localhost:" + portNum +"/" + server +"?wsdl");
+            qName = new QName("http://Replica1/", "CustomerImplService");
+            service = Service.create(url,qName);
+            clientObj = service.getPort(ICustomer.class);
+        }
+
 
         String response;
         switch (params[1].trim()){
