@@ -19,6 +19,7 @@ public class ReplicaManager3 {
     static URL url;
     static QName qName;
     static boolean isUrlChanged = false;
+    static boolean hasCrashOccurred = false;
     private static Service serviceAPI;
     static ServerInterface clientObj;
     //    private static String reqMsg;
@@ -177,6 +178,8 @@ public class ReplicaManager3 {
             OutremontServer.main(args);
             VerdunServer.main(args);
 
+            hasCrashOccurred = true;
+
             runPreviousRequests();
         }
         catch(Exception ex){
@@ -185,6 +188,8 @@ public class ReplicaManager3 {
     }
 
     public static void runPreviousRequests() throws MalformedURLException {
+        System.out.println("Running previous requests");
+        System.out.println(totalOrderList);
         for(String request: totalOrderList){
             String res = processRequest(request);
             System.out.println("Response for " + request + ":" + res);
@@ -265,14 +270,18 @@ public class ReplicaManager3 {
         String response;
         switch (params[1].trim()){
             case "addMovieSlots":
-                totalOrderList.add(reqMsg);
+                if(!hasCrashOccurred){
+                    totalOrderList.add(reqMsg);
+                }
                 //1_addMovieSlots_customerID_movieID_movieName_bookingCapacity
                 response = clientObj.addMovieSlots(params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "removeMovieSlots":
-                totalOrderList.add(reqMsg);
+                if(!hasCrashOccurred){
+                    totalOrderList.add(reqMsg);
+                }
                 //2_removeMovieSlots_customerID_movieID_movieName
                 response = clientObj.removeMovieSlots(params[3].trim(),params[4].trim(),true);
                 System.out.println("Response: " + response);
@@ -285,7 +294,9 @@ public class ReplicaManager3 {
                 return response;
 
             case "bookMovieTickets":
-                totalOrderList.add(reqMsg);
+                if(!hasCrashOccurred){
+                    totalOrderList.add(reqMsg);
+                }
                 //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
                 response = clientObj.bookMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
@@ -298,14 +309,18 @@ public class ReplicaManager3 {
                 return response;
 
             case "cancelMovieTickets":
-                totalOrderList.add(reqMsg);
+                if(!hasCrashOccurred){
+                    totalOrderList.add(reqMsg);
+                }
                 //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
                 response = clientObj.cancelMovieTickets(params[2].trim(),params[3].trim(),params[4].trim(),Integer.parseInt(params[5].trim()));
                 System.out.println("Response: " + response);
                 return response;
 
             case "exchangeTickets":
-                totalOrderList.add(reqMsg);
+                if(!hasCrashOccurred){
+                    totalOrderList.add(reqMsg);
+                }
                 //7_exchangeTickets_customerID_movieID_old_movieName_new_movieID_new_movieName_numberOfTickets
                 response = clientObj.exchangeTickets(params[2].trim(),params[3].trim(),params[4].trim(),params[5].trim(),params[6].trim(),Integer.parseInt(params[7].trim()));
                 System.out.println("Response: " + response);
