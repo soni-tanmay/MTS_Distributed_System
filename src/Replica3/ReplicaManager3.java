@@ -1,7 +1,6 @@
 package Replica3;
 
 import Replica1.AtwaterServer;
-import Replica1.ICustomer;
 import Replica1.OutremontServer;
 import Replica1.VerdunServer;
 import Utils.Constants;
@@ -17,6 +16,9 @@ import java.util.Enumeration;
 public class ReplicaManager3 {
     static Log rmLogger;
     static int seqCounter;
+    static URL url;
+    static QName qName;
+    static boolean isUrlChanged = false;
     private static Service serviceAPI;
     static ServerInterface clientObj;
     //    private static String reqMsg;
@@ -115,7 +117,9 @@ public class ReplicaManager3 {
                 }
                 else if(reqMsg.equals("SoftwareFailure")){
                     switchReplica();
+                    ds.close();
                 }
+                ds.close();
 
                 /*
                 * InetAddress ina = InetAddress.getLocalHost();
@@ -137,26 +141,59 @@ public class ReplicaManager3 {
         }
     }
 
-    public static void switchReplica(){
+    public static String getNewPortNum(String server){
+        String portNum = "";
+        if(server.equals("ATWATER")){
+            portNum = "8093";
+        }
+        else if(server.equals("OUTREMONT")){
+            portNum = "8091";
+        }
+        else{
+            portNum = "8092";
+        }
+        return portNum;
+    }
 
+    public static void switchReplica(){
+        try{
+            System.out.println("Switching replica");
+            isUrlChanged = true;
+            runPreviousRequests();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void restartReplica() throws Exception {
-        String []args = {"",""};
-        AtwaterServer.main(args);
-        OutremontServer.main(args);
-        VerdunServer.main(args);
-        runPreviousRequests();
+        try{
+            System.out.println("Restarting replica due to fault");
+            String []args = {"",""};
+            if(isUrlChanged){
+                isUrlChanged = false;
+            }
+            AtwaterServer.main(args);
+            OutremontServer.main(args);
+            VerdunServer.main(args);
+
+            runPreviousRequests();
+        }
+        catch(Exception ex){
+            ex.printStackTrace();
+        }
     }
 
     public static void runPreviousRequests() throws MalformedURLException {
         for(String request: totalOrderList){
-            processRequest(request);
+            String res = processRequest(request);
+            System.out.println("Response for " + request + ":" + res);
+            seqCounter = Integer.parseInt(request.substring(0,1));
         }
     }
 
     public static void getRequestFromSequencer(){
-        MulticastSocket ms;
+        MulticastSocket ms=null;
         try {
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
