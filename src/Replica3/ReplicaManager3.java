@@ -166,18 +166,22 @@ public class ReplicaManager3 {
             InetAddress group = InetAddress.getByName(Constants.NetworkIP);
             ms.joinGroup(group);
             while(true){
-                System.out.println("Thread started from RM3");
-                byte[] req = new byte[1024];
-                DatagramPacket dp = new DatagramPacket(req, req.length);
-                ms.receive(dp);
-                rmLogger.logger.info("Received datagram packet");
-                String reqMsg = (new String(dp.getData())).trim();
-                System.out.println("in thread reqMsg: " + reqMsg);
-                String response = processRequest(reqMsg);
-                sendResponseToFE(response);
-//                rmLogger.logger.info("Datagram packet response sent.");
-//                ms.close();
-//                rmLogger.logger.info("Multicast Socket closed.");
+                try{
+                    System.out.println("Thread started from RM1");
+                    byte[] req = new byte[1024];
+                    DatagramPacket dp = new DatagramPacket(req, req.length);
+                    ms.receive(dp);
+                    rmLogger.logger.info("Received datagram packet");
+                    String reqMsg = (new String(dp.getData())).trim();
+                    System.out.println("in thread reqMsg: " + reqMsg);
+                    String response = processRequest(reqMsg);
+                    sendResponseToFE(response);
+                }
+                catch(Exception ex){
+                    System.out.println("Exception occurred");
+                    ex.printStackTrace();
+                    rmLogger.logger.warning("Exception occurred: " + ex);
+                }
             }
         }
         catch(Exception ex) {
