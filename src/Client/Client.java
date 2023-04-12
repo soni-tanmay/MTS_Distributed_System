@@ -334,8 +334,8 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Details entered for booking: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                             try{
-                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets).StatusCode;
-                                if(res == 200){
+                                Response res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets);
+                                if(res.StatusCode == 200){
                                     System.out.println("Booking Successful!");
                                     clientLogger.logger.info("Booking was successful");
                                     serverLogger.logger.info("Booking was successful");
@@ -396,9 +396,9 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                             try{
-                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets).StatusCode;
+                                Response res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets);
                                 clientLogger.logger.info("webmts.Client call made to server");
-                                if(res == 200){
+                                if(res.StatusCode == 200){
                                     System.out.println("Cancellation successful");
                                 }
                                 else {
@@ -427,10 +427,10 @@ public class Client {
                             }
                             System.out.println("Please enter booking capacity");
                             bookingCapacity = getNumTickets();
-                            int res = clientObj.addMovieSlots(userid,movieId,movieName,bookingCapacity).StatusCode;
+                            Response res = clientObj.addMovieSlots(userid,movieId,movieName,bookingCapacity);
                             clientLogger.logger.info("Request sent to server");
                             clientLogger.logger.info("Params: " + movieName + " " + movieId + " " + bookingCapacity);
-                            if(res == 200){
+                            if(res.StatusCode == 200){
                                 System.out.println("Slots added successfully");
                             }
                             else {
@@ -455,8 +455,8 @@ public class Client {
                             }
                             clientLogger.logger.info("Request sent to server with params: " + movieName + " " + movieId);
 
-                            int res = clientObj.removeMovieSlots(userid,movieId, movieName).StatusCode;
-                            if(res == 200){
+                            Response res = clientObj.removeMovieSlots(userid,movieId, movieName);
+                            if(res.StatusCode == 200){
                                 System.out.println("Slots removed successfully");
                             }
                             else {
@@ -492,6 +492,7 @@ public class Client {
                                 serverLogger.logger.info("Server Response: " + res.body);
 
                             } else {
+                                System.out.println("Something went wrong!");
                             }
                         }
                         else if(action == 7){
@@ -513,9 +514,9 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + oldMovieName + " " + oldMovieID + " " + newMovieName + " " + newMovieID + " " + numTickets);
                             try{
-                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets).StatusCode;
+                                Response res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets);
                                 clientLogger.logger.info("Response from server: " + res);
-                                if(res == 200){
+                                if(res.StatusCode == 200){
                                     System.out.println("Exchange successful");
                                     clientLogger.logger.info("Exchange successful");
                                 }
@@ -564,8 +565,8 @@ public class Client {
                                 int numTickets = getNumTickets();
                                 clientLogger.logger.info("Details entered for booking: " + customerId + " " + movie + " " + movieID + " " + numTickets);
                                 clientLogger.logger.info("Request sent to server");
-                                int res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets).StatusCode;
-                                if(res == 200){
+                                Response res = clientObj.bookMovieTickets(customerId,movieID,movie,numTickets);
+                                if(res.StatusCode == 200){
                                     System.out.println("Booking Successful!");
                                 }
                                 else {
@@ -628,8 +629,8 @@ public class Client {
                                 System.out.println("Please enter number of tickets");
                                 int numTickets = getNumTickets();
                                 clientLogger.logger.info("Request sent to server with params: " + customerId + " " + movie + " " + movieID + " " + numTickets);
-                                int res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets).StatusCode;
-                                if(res == 200){
+                                Response res = clientObj.cancelMovieTickets(customerId, movieID, movie, numTickets);
+                                if(res.StatusCode == 200){
                                     System.out.println("Cancellation successful");
                                 }
                                 else{
@@ -660,9 +661,9 @@ public class Client {
                             int numTickets = getNumTickets();
                             clientLogger.logger.info("Params: " + customerId + " " + oldMovieName + " " + oldMovieID + " " + newMovieName + " " + newMovieID + " " + numTickets);
                             try{
-                                int res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets).StatusCode;
+                                Response res = clientObj.exchangeTickets(customerId, oldMovieName, oldMovieID, newMovieID, newMovieName, numTickets);
                                 clientLogger.logger.info("Response from server: " + res);
-                                if(res == 200){
+                                if(res.StatusCode == 200){
                                     System.out.println("Exchange successful");
                                 }
                                 else{
