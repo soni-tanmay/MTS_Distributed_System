@@ -12,6 +12,8 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 
 public class ReplicaManager2 {
@@ -90,6 +92,8 @@ public class ReplicaManager2 {
     public static void getRequestFromSequencer(){
         MulticastSocket ms = null;
         try {
+
+            Thread.sleep(6000);
             ms = new MulticastSocket(Constants.multicastSocket);
             //comment below 3 lines to test on own system
            NetworkInterface networkInterface = NetworkInterface.getByName("en0");
@@ -108,6 +112,8 @@ public class ReplicaManager2 {
                     String reqMsg = (new String(dp.getData())).trim();
                     System.out.println("in thread reqMsg: " + reqMsg);
                     String response = processRequest(reqMsg);
+                    CountDownLatch latch = new CountDownLatch(1);
+                    boolean timeoutReached = latch.await(6000, TimeUnit.MILLISECONDS);
                     sendResponseToFE(response);
                 }
                 catch(Exception ex){
