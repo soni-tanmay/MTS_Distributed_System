@@ -174,10 +174,8 @@ public class ReplicaManager2 {
                 ArrayList<String> myList = new ArrayList<String>(Arrays.asList(clientObj.listMovieShowsAvailability(params[3].trim(),Boolean.parseBoolean(params[4].trim()))));
                 Collections.sort(myList);
                 response = convertArrayToString(myList);
-                String resp = seqCounter + "-RM2-" + response;
-                // seqCounter = Integer.parseInt(request[0].trim());
-                System.out.println("Response: " + resp);
-                return resp;
+                System.out.println("Response: " + response);
+                return response;
 
             case "bookMovieTickets":
                 //4_bookMovieTickets_customerID_movieID_movieName_numberOfTickets
@@ -190,10 +188,7 @@ public class ReplicaManager2 {
                 ArrayList<String> bookingList = new ArrayList<String>(Arrays.asList(clientObj.getBookingSchedule(params[2].trim(),Boolean.parseBoolean(params[3].trim()))));
                 Collections.sort(bookingList);
                 response = convertArrayToString(bookingList);
-                String bookingResp = seqCounter + "-RM2-" + response;
-
-                System.out.println("Response: " + bookingResp);
-                return bookingResp;
+                return response;
 
             case "cancelMovieTickets":
                 //6_cancelMovieTickets_customerID_movieID_movieName_numberOfTickets
@@ -214,7 +209,8 @@ public class ReplicaManager2 {
     public static void sendResponseToFE(String response){
         DatagramSocket ds = null;
         try{
-            ds = new DatagramSocket(Constants.RM2Port);
+            // ds = new DatagramSocket(Constants.RM2Port);
+            ds = new DatagramSocket();
             byte[] req = response.getBytes();
             InetAddress ia = InetAddress.getByName(Constants.FE_IP);
             //uncomment below line to test on own env
@@ -233,6 +229,7 @@ public class ReplicaManager2 {
 //            rmLogger.logger.info("Function call completed successfully");
         }
         catch(Exception ex){
+            ex.printStackTrace();
             System.out.println("Exception occurred!");
             rmLogger.logger.warning("Exception occurred: " + ex);
         }

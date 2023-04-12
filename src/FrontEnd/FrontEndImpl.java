@@ -157,6 +157,8 @@ public class FrontEndImpl implements  IFrontEnd{
             DatagramSocket datagramSocket = new DatagramSocket();
             byte[] requestData = msg.getBytes();
             DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(ip), port);
+
+            // DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), port);
             System.out.println("requestDp: "+requestDp);
             datagramSocket.send(requestDp);
         }catch (Exception e){

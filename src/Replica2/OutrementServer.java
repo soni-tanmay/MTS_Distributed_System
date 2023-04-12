@@ -7,6 +7,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 import javax.xml.ws.Endpoint;
@@ -27,6 +28,56 @@ public class OutrementServer {
 
         BookingImplementation out = new BookingImplementation("OUT", outrementLogger);
 		Endpoint endpoint = Endpoint.publish("http://localhost:8081/OUTREMONT", out);
+
+        out.movies.put("AVATAR",new ConcurrentHashMap<String, Booking>(){
+            {
+                put("OUTM130423", new Booking(4));
+            }
+        });
+        out.movies.get("AVATAR").put("OUTE130423",new Booking(10));
+        out.movies.get("AVATAR").put("OUTA140423",new Booking(6));
+        out.movies.get("AVATAR").put("OUTE150423",new Booking(8));
+
+
+        out.movies.put("AVENGERS",new ConcurrentHashMap<String, Booking>(){
+            {
+                put("OUTA130423", new Booking(4));
+            }
+        });
+        out.movies.get("AVENGERS").put("OUTA140423",new Booking(5));
+        out.movies.get("AVENGERS").put("OUTA150423",new Booking(3));
+        ArrayList<String> customers = new ArrayList<>();
+        customers.add("OUTC7777");
+        out.movies.get("AVENGERS").get("OUTA150423").cust_ids = customers;
+
+
+        out.movies.put("TITANIC",new ConcurrentHashMap<String, Booking>(){
+            {
+                put("OUTA130423", new Booking(6));
+            }
+        });
+        out.movies.get("TITANIC").put("OUTA150423",new Booking(8));
+
+        ArrayList<Customer> shows2 = new ArrayList<>();
+        shows2.add(new Customer("AVENGERS",4,"OUTA150423"));
+        out.customers.put("OUTC7777", shows2);
+
+
+        //populate data for ATWC7777
+        ArrayList<Customer> shows = new ArrayList<>();
+        shows.add(new Customer("AVATAR",3, "ATWM130423"));
+        shows.add(new Customer("AVENGERS",2, "ATWM140423"));
+        out.customers.put("ATWC7777", shows);
+
+        //populate data for VERC7777
+        ArrayList<Customer> shows1 = new ArrayList<>();
+        shows1.add(new Customer("AVATAR",1,"ATWM130423"));
+        out.customers.put("VERC7777", shows1);
+
+        //populate data for OUTC7777
+        ArrayList<Customer> shows3 = new ArrayList<>();
+        shows2.add(new Customer("AVATAR",1, "ATWM130423"));
+        out.customers.put("OUTC7777", shows3);
 
         Thread UDPCommunicator = new Thread(){
             public void run() {           
