@@ -20,9 +20,12 @@ public class FrontEndImpl implements  IFrontEnd{
         this.log=log;
     }
 
-    private static long timeout = 5000;
+    private static long timeout = 10000;
     CountDownLatch latch;
     ArrayList<String> responses = new ArrayList<>();
+
+    public String rm_in_consideration = "";
+    int bugCount = 3;
     @Override
     public Response addMovieSlots(String customerID,String movieID, String movieName, int bookingCapacity) {
         System.out.println("Entered addMovieSlots");
@@ -136,7 +139,7 @@ public class FrontEndImpl implements  IFrontEnd{
             DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(Constants.SQ_IP), Constants.SQPort);
             //uncomment below line to test in own system
             //DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), Constants.SQPort);
-            System.out.println("requestDp: "+requestDp);
+            System.out.println("sendMsgtoSQ: "+requestDp);
             datagramSocket.send(requestDp);
 
             byte[] responseData = new byte[4096];
@@ -159,7 +162,7 @@ public class FrontEndImpl implements  IFrontEnd{
             DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getByName(ip), port);
 
             // DatagramPacket requestDp = new DatagramPacket(requestData, requestData.length, InetAddress.getLocalHost(), port);
-            System.out.println("requestDp: "+requestDp);
+            System.out.println("sendFailureMsg: "+requestDp+ port+ ip);
             datagramSocket.send(requestDp);
         }catch (Exception e){
             e.printStackTrace();
@@ -170,7 +173,10 @@ public class FrontEndImpl implements  IFrontEnd{
     void startTimer(){
         try {
             latch = new CountDownLatch(1);
-            latch.await(timeout, TimeUnit.MILLISECONDS);
+            boolean timeoutReached = latch.await(timeout, TimeUnit.MILLISECONDS);
+            if (timeoutReached) {
+                System.out.println("FrontEndImpl_startTimer: timeoutReached");
+            }
         }catch (Exception e){
             e.printStackTrace();
             System.out.println("FrontEndImpl_startTimer: " + e);
@@ -181,6 +187,31 @@ public class FrontEndImpl implements  IFrontEnd{
         responses.add(response);
     }
 
+    void checkRMsFailure(String rm){
+        if(rm_in_consideration.equals(rm)){
+            bugCount--;
+            if (bugCount==0){
+                switch (rm) {
+                    case "RM1":
+                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
+                        break;
+                    case "RM2":
+                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
+                        break;
+                    case "RM3":
+                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
+                        break;
+                    case "RM4":
+                        sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"SoftwareFailure");
+                        break;
+                }
+            }
+        }else {
+            rm_in_consideration = rm;
+            bugCount=2;
+        }
+    }
+
     Response responseGenerator(){
         String rm1 = "";
         String rm2 = "";
@@ -188,59 +219,79 @@ public class FrontEndImpl implements  IFrontEnd{
         String rm4 = "";
 
         for (String s : responses){
-            if (s.contains("RM1")){
-                rm1 = s.split("-")[2];
-            } else if (s.contains("RM2")) {
-                rm2 = s.split("-")[2];
-            }else if (s.contains("RM3")){
-                rm3 = s.split("-")[2];
-            }else if (s.contains("RM4")){
-                rm4 = s.split("-")[2];
+            switch (s.split("-")[1]) {
+                case "RM1":
+                    rm1 = s.split("-")[2];
+                    break;
+                case "RM2":
+                    rm2 = s.split("-")[2];
+                    break;
+                case "RM3":
+                    rm3 = s.split("-")[2];
+                    break;
+                case "RM4":
+                    rm4 = s.split("-")[2];
+                    break;
             }
         }
-        if(responses.size()==4){
+        System.out.println("rm1"+rm1);
+        System.out.println("rm2"+rm2);
+        System.out.println("rm3"+rm3);
+        System.out.println("rm4"+rm4);
+
+        if(responses.size()==4 && !(rm1.equals("Failure") || rm2.equals("Failure") || rm3.equals("Failure") || rm4.equals("Failure"))){
             if (matchResponse(rm1,rm2) && matchResponse(rm2,rm3) && matchResponse(rm3,rm4)) {
                 // success send response to client
+                rm_in_consideration="";
+                bugCount=3;
                 return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
             }else{
                 if (matchResponse(rm1,rm2)){
                     if(matchResponse(rm2,rm3)){
                         // software failure in rm4
-                        sendFailureMsg(Constants.RM4_IP,Constants.RM1Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"SoftwareFailure");
+                        checkRMsFailure("RM4");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm2,rm4)){
                         // software failure in rm3
-                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
+                        checkRMsFailure("RM3");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }
                 }else if(matchResponse(rm2,rm3)){
                     if (matchResponse(rm3,rm1)){
                         // software failure in rm4
-                        sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM4_IP,Constants.RM4Port,"SoftwareFailure");
+                        checkRMsFailure("RM4");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm3,rm4)){
                         // software failure in rm1
-                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
+                        checkRMsFailure("RM1");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm3.split("_")) ));
                     }
                 }else if(matchResponse(rm3,rm4)){
                     if (matchResponse(rm4,rm1)){
                         // software failure in rm2
-                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
+                        checkRMsFailure("RM2");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm4,rm2)){
                         // software failure in rm1
-                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM1_IP,Constants.RM1Port,"SoftwareFailure");
+                        checkRMsFailure("RM1");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm3.split("_")) ));
                     }
                 }else if (matchResponse(rm4,rm1)){
                     if (matchResponse(rm1,rm2)){
                         // software failure in rm3
-                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM3_IP,Constants.RM3Port,"SoftwareFailure");
+                        checkRMsFailure("RM3");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }else if (matchResponse(rm1,rm3)){
                         // software failure in rm2
-                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
+//                        sendFailureMsg(Constants.RM2_IP,Constants.RM2Port,"SoftwareFailure");
+                        checkRMsFailure("RM2");
                         return new Response(200, new ArrayList<>(Arrays.asList(rm1.split("_")) ));
                     }
                 }

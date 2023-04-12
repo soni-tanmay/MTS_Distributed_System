@@ -130,6 +130,7 @@ public class ReplicaManager3 {
             }
         }
         catch(Exception ex) {
+            ex.printStackTrace();
             System.out.println("Exception occurred!!!");
             rmLogger.logger.warning("Exception occurred: " + ex);
             System.out.println(ex);
@@ -296,6 +297,7 @@ public class ReplicaManager3 {
 //            rmLogger.logger.info("Function call completed successfully");
         }
         catch(Exception ex){
+            ex.printStackTrace();
             System.out.println("Exception occurred!");
             rmLogger.logger.warning("Exception occurred: " + ex);
         }
