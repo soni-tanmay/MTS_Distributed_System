@@ -8,6 +8,8 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.TimerTask;
+import java.util.Timer;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.CountDownLatch;
 
@@ -26,12 +28,15 @@ public class FrontEndImpl implements  IFrontEnd{
 
     public String rm_in_consideration = "";
     int bugCount = 3;
+    long secondsPassed = 0;
+    Timer timerObj;
     @Override
     public Response addMovieSlots(String customerID,String movieID, String movieName, int bookingCapacity) {
         System.out.println("Entered addMovieSlots");
         try {
             String request = "addMovieSlots_" + customerID + "_" + movieID + "_" + movieName+"_"+bookingCapacity;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -47,6 +52,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "removeMovieSlots_" + customerID + "_" + movieID + "_" + movieName;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -62,6 +68,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "listMovieShowsAvailability_" + customerID + "_" + movieName + "_" + isClientCall;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             System.out.println("FrontEndImpl_listMovieShowsAvailability: after requestFEtoSQ" );
             return responseGenerator();
@@ -78,6 +85,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "bookMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -93,6 +101,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "getBookingSchedule_" + customerID + "_" + isClientCall;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -108,6 +117,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "cancelMovieTickets_" + customerID + "_" + movieID+"_"+movieName+"_"+numberOfTickets;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -123,6 +133,7 @@ public class FrontEndImpl implements  IFrontEnd{
         try {
             String request = "exchangeTickets_" + customerID + "_" + movieID+"_"+old_movieName+"_"+new_movieID+"_"+new_movieName+"_"+numberOfTickets;
             responses.clear();
+            timerManager();
             requestFEtoSQ(request);
             return responseGenerator();
         }catch (Exception e){
@@ -185,7 +196,9 @@ public class FrontEndImpl implements  IFrontEnd{
 
     public void responseRM (String response){
         responses.add(response);
-        System.out.println("responseRM time: "+latch.getCount());
+        if((secondsPassed*2000)>timeout){
+            timeout = secondsPassed*2000;
+        }
     }
 
     void checkRMsFailure(String rm){
@@ -214,6 +227,7 @@ public class FrontEndImpl implements  IFrontEnd{
     }
 
     Response responseGenerator(){
+        timerObj.cancel();
         String rm1 = "";
         String rm2 = "";
         String rm3 = "";
@@ -222,16 +236,24 @@ public class FrontEndImpl implements  IFrontEnd{
         for (String s : responses){
             switch (s.split("-")[1]) {
                 case "RM1":
-                    rm1 = s.split("-")[2];
+                    if(s.split("-").length>2) {
+                        rm1 = s.split("-")[2];
+                    }
                     break;
                 case "RM2":
-                    rm2 = s.split("-")[2];
+                    if(s.split("-").length>2) {
+                        rm2 = s.split("-")[2];
+                    }
                     break;
                 case "RM3":
-                    rm3 = s.split("-")[2];
+                    if(s.split("-").length>2) {
+                        rm3 = s.split("-")[2];
+                    }
                     break;
                 case "RM4":
-                    rm4 = s.split("-")[2];
+                    if(s.split("-").length>2) {
+                        rm4 = s.split("-")[2];
+                    }
                     break;
             }
         }
@@ -321,6 +343,18 @@ public class FrontEndImpl implements  IFrontEnd{
 
     boolean matchResponse(String r1,String r2){
         return r1.equals(r2);
+    }
+
+    public void timerManager() {
+        secondsPassed = 0;
+        TimerTask task = new TimerTask() {
+            public void run() {
+                secondsPassed++;
+                System.out.println("Seconds elapsed: " + secondsPassed);
+            }
+        };
+        timerObj = new Timer();
+        timerObj.schedule(task, 0, 1000); // Schedule the task to run every second
     }
 }
 
