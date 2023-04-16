@@ -78,6 +78,20 @@ public class ReplicaManager1 {
             }
         ).start();
         listenToFE();
+//        listenToOtherRMs();
+    }
+
+    public static void listenToOtherRMs(){
+        new Thread(
+                () -> {
+                    try{
+                        getRequestFromFE();
+                    }
+                    catch(Exception ex){
+                        ex.printStackTrace();
+                    }
+                }
+        ).start();
     }
 
     public static void listenToFE(){
@@ -213,7 +227,12 @@ public class ReplicaManager1 {
                     String reqMsg = (new String(dp.getData())).trim();
                     System.out.println("in thread reqMsg: " + reqMsg);
                     String response = processRequest(reqMsg);
-                    sendResponseToFE(response);
+                    if(reqMsg.substring(0,1).equals(-1)){
+                        sendResponseToRMs(reqMsg);
+                    }
+                    else{
+                        sendResponseToFE(response);
+                    }
                 }
                 catch(Exception ex){
                     System.out.println("Exception occurred");
@@ -233,6 +252,10 @@ public class ReplicaManager1 {
         }
     }
 
+    public static void sendResponseToRMs(String reqMsg){
+        String rmNum = reqMsg.split("_")[1];
+
+    }
     public static String processRequest(String reqMsg) throws MalformedURLException {
         System.out.println("Entered process Request");
         if(reqMsg.isEmpty()) {

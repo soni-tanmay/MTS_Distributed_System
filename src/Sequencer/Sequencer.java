@@ -1,12 +1,12 @@
 package Sequencer;
 
 import java.io.IOException;
-import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
+import java.net.*;
 // import java.net.InetAddress;
-import java.net.SocketException;
-import java.net.UnknownHostException;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 
 import Utils.Constants;
 
@@ -47,7 +47,9 @@ public class Sequencer {
             System.out.println("seqNo " + seqNo);
             byte[] message = seqData.getBytes();
 
-            broadcastToRm(message);
+            List<InetAddress> listAllBroadcastAddresses = listAllBroadcastAddresses();
+            broadcastToRm(listAllBroadcastAddresses,message,multicastPort);
+            //broadcastToRm(message);
             
             sendSeqNoToFE(dp, seqData);
         }
@@ -80,27 +82,83 @@ public class Sequencer {
             }
     }
 
-    private void broadcastToRm(byte[] data) {
-        DatagramSocket socket1;
-                try {
-                    socket1 = new DatagramSocket();
-                } catch (SocketException e) {
-                    throw new RuntimeException(e);
-                }
-                try {
-                    socket1.setBroadcast(true);
-                } catch (SocketException e) {
-                    throw new RuntimeException(e);
-                }
-                DatagramPacket dp
-                        = new DatagramPacket(data, data.length, multicastAddr, multicastPort);
-                try {
-                    socket1.send(dp);
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                socket1.close();
+//    private void broadcastToRm(byte[] data) {
+//        DatagramSocket socket1;
+//                try {
+//                    socket1 = new DatagramSocket();
+//                } catch (SocketException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                try {
+//                    socket1.setBroadcast(true);
+//                } catch (SocketException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                DatagramPacket dp
+//                        = new DatagramPacket(data, data.length, multicastAddr, multicastPort);
+//                try {
+//                    socket1.send(dp);
+//                } catch (IOException e) {
+//                    throw new RuntimeException(e);
+//                }
+//                socket1.close();
+//
+//    }
 
+    private void broadcastToRm(List<InetAddress> listAllBroadcastAddresses, byte[] sequencedData, int multicastPort) {
+        for(InetAddress addr: listAllBroadcastAddresses) {
+            DatagramSocket socketInner;
+            try {
+                socketInner = new DatagramSocket();
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+            try {
+                socketInner.setBroadcast(true);
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+
+            //System.out.println("Sequencer sending request to RM : MulticastAddress - "+multicastAddress);
+            System.out.println("Sequencer sending request to RM : MulticastPort - "+multicastPort);
+
+            DatagramPacket packet
+                    = new DatagramPacket(sequencedData, sequencedData.length, addr, multicastPort);
+            try {
+                socketInner.send(packet);
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            socketInner.close();
+        }
+    }
+
+    private List<InetAddress> listAllBroadcastAddresses() {
+        List<InetAddress> broadcastList = new ArrayList<>();
+        Enumeration<NetworkInterface> interfaces
+                = null;
+        try {
+            interfaces = NetworkInterface.getNetworkInterfaces();
+        } catch (SocketException e) {
+            throw new RuntimeException(e);
+        }
+        while (interfaces.hasMoreElements()) {
+            NetworkInterface networkInterface = interfaces.nextElement();
+
+            try {
+                if (networkInterface.isLoopback() || !networkInterface.isUp()) {
+                    continue;
+                }
+            } catch (SocketException e) {
+                throw new RuntimeException(e);
+            }
+
+            networkInterface.getInterfaceAddresses().stream()
+                    .map(a -> a.getBroadcast())
+                    .filter(Objects::nonNull)
+                    .forEach(broadcastList::add);
+        }
+        return broadcastList;
     }
 
     public static void main(String[] args) throws IOException {

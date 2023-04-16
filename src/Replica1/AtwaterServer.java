@@ -33,7 +33,7 @@ public class AtwaterServer {
             //make static hashmap
             atwClient.movies.put("AVATAR",new ConcurrentHashMap<String, MovieData>(){
                 {
-                    put("ATWM130423", new MovieData(8)); //8 is correct
+                    put("ATWM130423", new MovieData(48)); //8 is correct
                 }
             });
             atwClient.movies.get("AVATAR").put("ATWM140423",new MovieData(15));
